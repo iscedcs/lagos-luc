@@ -291,12 +291,12 @@ export default function RegistrationForm() {
   const tabs = [
     {
       id: "property-identification",
-      label: "Property Identification",
+      label: "Identification",
       icon: <MapPin className="h-4 w-4" />,
     },
     {
       id: "owner-information",
-      label: "Owner Information",
+      label: "Owner",
       icon: <User className="h-4 w-4" />,
     },
     {
@@ -311,7 +311,7 @@ export default function RegistrationForm() {
     },
     {
       id: "property-details",
-      label: "Property Details",
+      label: "Details",
       icon: <Building className="h-4 w-4" />,
     },
     {
@@ -458,7 +458,7 @@ export default function RegistrationForm() {
 
       {/* Certificate Dialog */}
       <Dialog open={showCertificate} onOpenChange={setShowCertificate}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+        <DialogContent className="max-w-4xl  p-0 overflow-hidden">
           {registeredProperty && (
             <PropertyCertificate
               property={registeredProperty}

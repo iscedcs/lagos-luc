@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import PropertiesDataTable from "./properties-data-table"
 import PropertyStatusChart from "./property-status-chart"
 import PropertyFilters from "./property-filters"
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Property Management | Lagos Property Map",
@@ -19,7 +20,9 @@ export default function PropertiesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Properties</h2>
-          <p className="text-muted-foreground">Manage and monitor all properties in the Lagos Property Map system</p>
+          <p className="text-muted-foreground">
+            Manage and monitor all properties in the Lagos Property Map system
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="h-9">
@@ -34,9 +37,15 @@ export default function PropertiesPage() {
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button size="sm" className="h-9 bg-emerald-600 hover:bg-emerald-700">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Property
+          <Button
+            size="sm"
+            className="h-9 bg-emerald-600 hover:bg-emerald-700"
+            asChild
+          >
+            <Link href="/register-property" className="flex items-center">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Property
+            </Link>
           </Button>
         </div>
       </div>
@@ -45,53 +54,75 @@ export default function PropertiesPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Properties
+            </CardTitle>
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">15,432</div>
-            <p className="text-xs text-muted-foreground">Across all zones and categories</p>
+            <p className="text-xs text-muted-foreground">
+              Across all zones and categories
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Verified Properties</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Verified Properties
+            </CardTitle>
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12,845</div>
             <div className="flex items-center">
-              <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200">83.2%</Badge>
-              <span className="ml-2 text-xs text-muted-foreground">of total</span>
+              <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200">
+                83.2%
+              </Badge>
+              <span className="ml-2 text-xs text-muted-foreground">
+                of total
+              </span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending Verification</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Pending Verification
+            </CardTitle>
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1,876</div>
             <div className="flex items-center">
-              <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">12.2%</Badge>
-              <span className="ml-2 text-xs text-muted-foreground">of total</span>
+              <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
+                12.2%
+              </Badge>
+              <span className="ml-2 text-xs text-muted-foreground">
+                of total
+              </span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Disputed Properties</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Disputed Properties
+            </CardTitle>
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">711</div>
             <div className="flex items-center">
-              <Badge className="bg-red-100 text-red-800 hover:bg-red-200">4.6%</Badge>
-              <span className="ml-2 text-xs text-muted-foreground">of total</span>
+              <Badge className="bg-red-100 text-red-800 hover:bg-red-200">
+                4.6%
+              </Badge>
+              <span className="ml-2 text-xs text-muted-foreground">
+                of total
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -101,7 +132,9 @@ export default function PropertiesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Property Distribution</CardTitle>
-          <CardDescription>Distribution of properties by type and status</CardDescription>
+          <CardDescription>
+            Distribution of properties by type and status
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -145,6 +178,6 @@ export default function PropertiesPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 

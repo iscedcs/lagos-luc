@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Printer, X } from "lucide-react"
 import QRCode from "react-qr-code"
+import Image from "next/image";
 
 interface PropertyCertificateProps {
   property: any
@@ -62,17 +63,35 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
               <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-xs text-gray-500">Lagos State Logo</span>
+                <Image
+                  src="/lagos.png"
+                  alt="Lagos State Logo"
+                  width={80}
+                  height={80}
+                  className="rounded-full"
+                />
               </div>
             </div>
             <div className="text-center flex-1">
-              <h1 className="text-2xl font-bold text-emerald-800">LAGOS STATE GOVERNMENT</h1>
-              <h2 className="text-xl font-semibold">LAND USE CHARGE DEPARTMENT</h2>
-              <h3 className="text-lg font-medium mt-1">PROPERTY REGISTRATION CERTIFICATE</h3>
+              <h1 className="text-2xl font-bold text-emerald-800">
+                LAGOS STATE GOVERNMENT
+              </h1>
+              <h2 className="text-xl font-semibold">
+                LAND USE CHARGE DEPARTMENT
+              </h2>
+              <h3 className="text-lg font-medium mt-1">
+                PROPERTY REGISTRATION CERTIFICATE
+              </h3>
             </div>
             <div className="flex items-center">
               <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-xs text-gray-500">LIRS Logo</span>
+                <Image
+                  src="/lirs.png"
+                  alt="LIRS Logo"
+                  width={80}
+                  height={80}
+                  className="rounded-full"
+                />
               </div>
             </div>
           </div>
@@ -80,7 +99,9 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
           <div className="grid grid-cols-3 gap-6">
             <div className="col-span-2 space-y-6">
               <div className="border-b pb-2">
-                <h4 className="text-sm font-semibold text-gray-500">PROPERTY IDENTIFICATION</h4>
+                <h4 className="text-sm font-semibold text-gray-500">
+                  PROPERTY IDENTIFICATION
+                </h4>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <div>
                     <p className="text-sm font-medium">Property ID:</p>
@@ -94,7 +115,9 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
               </div>
 
               <div className="border-b pb-2">
-                <h4 className="text-sm font-semibold text-gray-500">PROPERTY DETAILS</h4>
+                <h4 className="text-sm font-semibold text-gray-500">
+                  PROPERTY DETAILS
+                </h4>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <div>
                     <p className="text-sm font-medium">Address:</p>
@@ -122,7 +145,8 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
                     <p className="text-sm font-medium">Property Use:</p>
                     <p>{property.propertyUse}</p>
                   </div>
-                  {property.propertyType === "Building" || property.propertyType === "Mixed-use" ? (
+                  {property.propertyType === "Building" ||
+                  property.propertyType === "Mixed-use" ? (
                     <>
                       <div>
                         <p className="text-sm font-medium">Building Type:</p>
@@ -143,7 +167,9 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
               </div>
 
               <div className="border-b pb-2">
-                <h4 className="text-sm font-semibold text-gray-500">OWNER INFORMATION</h4>
+                <h4 className="text-sm font-semibold text-gray-500">
+                  OWNER INFORMATION
+                </h4>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <div>
                     <p className="text-sm font-medium">Owner Name:</p>
@@ -157,18 +183,28 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-gray-500">VALUATION & CHARGES</h4>
+                <h4 className="text-sm font-semibold text-gray-500">
+                  VALUATION & CHARGES
+                </h4>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <div>
                     <p className="text-sm font-medium">Property Value:</p>
                     <p className="font-bold">
-                      ₦{new Intl.NumberFormat().format(Number.parseFloat(calculatePropertyValue(property)))}
+                      ₦
+                      {new Intl.NumberFormat().format(
+                        Number.parseFloat(calculatePropertyValue(property))
+                      )}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Annual Land Use Charge:</p>
+                    <p className="text-sm font-medium">
+                      Annual Land Use Charge:
+                    </p>
                     <p className="font-bold text-emerald-700">
-                      ₦{new Intl.NumberFormat().format(Number.parseFloat(calculateLUC(property)))}
+                      ₦
+                      {new Intl.NumberFormat().format(
+                        Number.parseFloat(calculateLUC(property))
+                      )}
                     </p>
                   </div>
                   <div>
@@ -188,27 +224,34 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
                 <div className="bg-white p-2 border">
                   <QRCode value={property.qrCodeData} size={150} />
                 </div>
-                <p className="text-xs text-center mt-2">Scan to verify property details</p>
+                <p className="text-xs text-center mt-2">
+                  Scan to verify property details
+                </p>
               </div>
 
               <div className="text-center mt-8">
                 <div className="h-20 mb-2 mx-auto border-b border-dashed border-gray-300 w-48"></div>
                 <p className="font-medium">Authorized Signature</p>
-                <p className="text-sm text-gray-500">Director, Land Use Charge</p>
+                <p className="text-sm text-gray-500">
+                  Director, Land Use Charge
+                </p>
               </div>
 
               <div className="text-center mt-4">
                 <p className="text-xs text-gray-500">
-                  This certificate serves as proof of property registration and payment of Land Use Charge.
+                  This certificate serves as proof of property registration and
+                  payment of Land Use Charge.
                 </p>
-                <p className="text-xs text-gray-500 mt-1">For verification, visit: www.lagospropertymap.gov.ng</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  For verification, visit: www.lagospropertymap.gov.ng
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Helper functions to calculate property value and LUC

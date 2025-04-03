@@ -151,28 +151,40 @@ export default function PropertyCertificatePreview({ property }: PropertyCertifi
 
       <Card>
         <CardContent className="p-0 overflow-auto">
-          <div ref={certificateRef} className="w-full p-6 bg-white landscape" style={{ minWidth: "800px" }}>
+          <div
+            ref={certificateRef}
+            className="w-full p-6 bg-white landscape"
+            style={{ minWidth: "800px" }}
+          >
             <div className="border-8 border-double border-emerald-600 p-6">
               <div className="flex justify-between items-center mb-6">
                 <div className="w-20 h-20 relative">
                   <Image
-                    src="https://lagosstate.gov.ng/static/media/lasg__logo.a2c220a60f6e22b1113d.png"
+                    src="/lagos.png"
                     alt="Lagos State Logo"
                     width={80}
                     height={80}
+                    className="rounded-full"
                   />
                 </div>
                 <div className="text-center flex-1">
-                  <h1 className="text-2xl font-bold text-emerald-800">LAGOS STATE GOVERNMENT</h1>
-                  <h2 className="text-xl font-semibold">LAND USE CHARGE DEPARTMENT</h2>
-                  <h3 className="text-lg font-medium mt-1">PROPERTY REGISTRATION CERTIFICATE</h3>
+                  <h1 className="text-2xl font-bold text-emerald-800">
+                    LAGOS STATE GOVERNMENT
+                  </h1>
+                  <h2 className="text-xl font-semibold">
+                    LAND USE CHARGE DEPARTMENT
+                  </h2>
+                  <h3 className="text-lg font-medium mt-1">
+                    PROPERTY REGISTRATION CERTIFICATE
+                  </h3>
                 </div>
                 <div className="w-20 h-20 relative">
                   <Image
-                    src="https://revenue.lagosstate.gov.ng/assets/image/newlogo.png"
+                    src="/lirs.png"
                     alt="LIRS Logo"
                     width={80}
                     height={80}
+                    className="rounded-full"
                   />
                 </div>
               </div>
@@ -180,21 +192,33 @@ export default function PropertyCertificatePreview({ property }: PropertyCertifi
               <div className="grid grid-cols-3 gap-6">
                 <div className="col-span-2 space-y-6">
                   <div className="border-b pb-2">
-                    <h4 className="text-sm font-semibold text-gray-500">PROPERTY IDENTIFICATION</h4>
+                    <h4 className="text-sm font-semibold text-gray-500">
+                      PROPERTY IDENTIFICATION
+                    </h4>
                     <div className="grid grid-cols-2 gap-4 mt-2">
                       <div>
                         <p className="text-sm font-medium">Property ID:</p>
-                        <p className="text-lg font-bold">{property.propertyId}</p>
+                        <p className="text-lg font-bold">
+                          {property.propertyId}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Registration Date:</p>
-                        <p>{new Date(property.registrationDate).toLocaleDateString()}</p>
+                        <p className="text-sm font-medium">
+                          Registration Date:
+                        </p>
+                        <p>
+                          {new Date(
+                            property.registrationDate
+                          ).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="border-b pb-2">
-                    <h4 className="text-sm font-semibold text-gray-500">PROPERTY DETAILS</h4>
+                    <h4 className="text-sm font-semibold text-gray-500">
+                      PROPERTY DETAILS
+                    </h4>
                     <div className="grid grid-cols-2 gap-4 mt-2">
                       <div>
                         <p className="text-sm font-medium">Address:</p>
@@ -222,10 +246,13 @@ export default function PropertyCertificatePreview({ property }: PropertyCertifi
                         <p className="text-sm font-medium">Property Use:</p>
                         <p>{property.use}</p>
                       </div>
-                      {property.type === "Building" || property.type === "Mixed-use" ? (
+                      {property.type === "Building" ||
+                      property.type === "Mixed-use" ? (
                         <>
                           <div>
-                            <p className="text-sm font-medium">Building Type:</p>
+                            <p className="text-sm font-medium">
+                              Building Type:
+                            </p>
                             <p>{property.buildingType}</p>
                           </div>
                           <div>
@@ -243,7 +270,9 @@ export default function PropertyCertificatePreview({ property }: PropertyCertifi
                   </div>
 
                   <div className="border-b pb-2">
-                    <h4 className="text-sm font-semibold text-gray-500">OWNER INFORMATION</h4>
+                    <h4 className="text-sm font-semibold text-gray-500">
+                      OWNER INFORMATION
+                    </h4>
                     <div className="grid grid-cols-2 gap-4 mt-2">
                       <div>
                         <p className="text-sm font-medium">Owner Name:</p>
@@ -257,23 +286,35 @@ export default function PropertyCertificatePreview({ property }: PropertyCertifi
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-500">VALUATION & CHARGES</h4>
+                    <h4 className="text-sm font-semibold text-gray-500">
+                      VALUATION & CHARGES
+                    </h4>
                     <div className="grid grid-cols-2 gap-4 mt-2">
                       <div>
                         <p className="text-sm font-medium">Property Value:</p>
-                        <p className="font-bold">{formatCurrency(property.value)}</p>
+                        <p className="font-bold">
+                          {formatCurrency(property.value)}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Annual Land Use Charge:</p>
-                        <p className="font-bold text-emerald-700">{formatCurrency(property.luc)}</p>
+                        <p className="text-sm font-medium">
+                          Annual Land Use Charge:
+                        </p>
+                        <p className="font-bold text-emerald-700">
+                          {formatCurrency(property.luc)}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm font-medium">Valid Until:</p>
-                        <p>{new Date(property.paymentDue).toLocaleDateString()}</p>
+                        <p>
+                          {new Date(property.paymentDue).toLocaleDateString()}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm font-medium">Payment Status:</p>
-                        <p className="text-emerald-600 font-medium capitalize">{property.paymentStatus}</p>
+                        <p className="text-emerald-600 font-medium capitalize">
+                          {property.paymentStatus}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -282,22 +323,32 @@ export default function PropertyCertificatePreview({ property }: PropertyCertifi
                 <div className="flex flex-col items-center justify-between">
                   <div className="flex flex-col items-center">
                     <div className="bg-white p-2 border">
-                      <QRCode value={`LGS-PROP-${property.propertyId}`} size={150} />
+                      <QRCode
+                        value={`LGS-PROP-${property.propertyId}`}
+                        size={150}
+                      />
                     </div>
-                    <p className="text-xs text-center mt-2">Scan to verify property details</p>
+                    <p className="text-xs text-center mt-2">
+                      Scan to verify property details
+                    </p>
                   </div>
 
                   <div className="text-center mt-8">
                     <div className="h-20 mb-2 mx-auto border-b border-dashed border-gray-300 w-48"></div>
                     <p className="font-medium">Authorized Signature</p>
-                    <p className="text-sm text-gray-500">Director, Land Use Charge</p>
+                    <p className="text-sm text-gray-500">
+                      Director, Land Use Charge
+                    </p>
                   </div>
 
                   <div className="text-center mt-4">
                     <p className="text-xs text-gray-500">
-                      This certificate serves as proof of property registration and payment of Land Use Charge.
+                      This certificate serves as proof of property registration
+                      and payment of Land Use Charge.
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">For verification, visit: www.lagospropertymap.gov.ng</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      For verification, visit: www.lagospropertymap.gov.ng
+                    </p>
                   </div>
                 </div>
               </div>
@@ -306,6 +357,6 @@ export default function PropertyCertificatePreview({ property }: PropertyCertifi
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
