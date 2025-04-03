@@ -103,7 +103,7 @@ export default function LandingPage() {
           </div>
           <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden shadow-xl">
             <Image
-              src="/placeholder.svg?height=400&width=600"
+              src="/luc-property-map.png?height=400&width=600"
               alt="Lagos Property Map Preview"
               fill
               className="object-cover"
