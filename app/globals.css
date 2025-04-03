@@ -135,12 +135,54 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
 }
-
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
   }
 }
+/* Add these styles to your globals.css file */
+.vis-gl-autocomplete-input {
+  width: 100% !important;
+  height: 40px !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--input) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.vis-gl-autocomplete-input:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring) !important;
+}
+
+.vis-gl-autocomplete-input::placeholder {
+  color: var(--muted-foreground) !important;
+}
+
+.vis-gl-autocomplete-dropdown {
+  background-color: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.375rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  z-index: 50 !important;
+}
+
+.vis-gl-autocomplete-suggestion {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+}
+
+.vis-gl-autocomplete-suggestion:hover {
+  background-color: var(--accent) !important;
+}
+
+.vis-gl-autocomplete-suggestion-active {
+  background-color: var(--accent) !important;
+}
+
