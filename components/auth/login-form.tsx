@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { loginUser } from "./actions";
+import { loginUser } from "../../actions/actions";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -181,8 +181,7 @@ export default function LoginForm() {
         <Button
           type="submit"
           className="w-full bg-emerald-600 hover:bg-emerald-700"
-          disabled={isLoading}
-        >
+          disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Log In
         </Button>
