@@ -13,8 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LoginForm from "../../../components/auth/login-form";
-
+import LoginForm from "./login-form";
 export const metadata: Metadata = {
   title: "Login | Lagos Property Map",
   description: "Login to your Lagos Property Map account",

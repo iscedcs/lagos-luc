@@ -26,7 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { loginUser } from "../../actions/actions";
+import { loginUser } from "../../../actions/actions";
+import { signIn } from "@/auth";
+import { signInAction } from "@/actions/auth";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -35,8 +37,6 @@ const formSchema = z.object({
   password: z.string().min(8, {
     message: "Password must be at least 8 characters.",
   }),
-  rememberMe: z.boolean().default(false),
-  userType: z.enum(["admin", "superadmin", "agent", "owner", "guest"]),
 });
 
 export default function LoginForm() {
@@ -48,8 +48,6 @@ export default function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
-      userType: "owner",
     },
   });
 
@@ -57,32 +55,34 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const result = await loginUser(values);
+      const result = await signInAction(values.email, values.password);
 
-      if (result.success) {
-        // Redirect based on user type
-        switch (values.userType) {
-          case "superadmin":
-            router.push("/dashboard");
-            break;
-          case "admin":
-            router.push("/dashboard");
-            break;
-          case "agent":
-            router.push("/agent/dashboard");
-            break;
-          case "owner":
-            router.push("/owner/dashboard");
-            break;
-          default:
-            router.push("/");
-        }
-      } else {
-        // Handle error
-        form.setError("root", {
-          message: result.message || "Invalid credentials. Please try again.",
-        });
-      }
+      // if (result.success) {
+      //   // Redirect based on user type
+      //   switch (values.userType) {
+      //     case "superadmin":
+      //       router.push("/dashboard");
+      //       break;
+      //     case "admin":
+      //       router.push("/dashboard");
+      //       break;
+      //     case "agent":
+      //       router.push("/agent/dashboard");
+      //       break;
+      //     case "owner":
+      //       router.push("/owner/dashboard");
+      //       break;
+      //     default:
+      //       router.push("/");
+      //   }
+      // } else {
+      //   // Handle error
+      //   form.setError("root", {
+      //     message: result.message || "Invalid credentials. Please try again.",
+      //   });
+      // }
+
+      console.log({result})
     } catch (error) {
       console.error("Login error:", error);
       form.setError("root", {
@@ -101,34 +101,6 @@ export default function LoginForm() {
             {form.formState.errors.root.message}
           </div>
         )}
-
-        <FormField
-          control={form.control}
-          name="userType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>User Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your user type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="owner">Property Owner</SelectItem>
-                  <SelectItem value="agent">LUC Agent</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="superadmin">Super Admin</SelectItem>
-                  <SelectItem value="guest">Guest</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                For demo purposes - select your role
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <FormField
           control={form.control}
@@ -157,24 +129,6 @@ export default function LoginForm() {
                 />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="rememberMe"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Remember me</FormLabel>
-                <FormDescription>Stay logged in on this device</FormDescription>
-              </div>
             </FormItem>
           )}
         />
