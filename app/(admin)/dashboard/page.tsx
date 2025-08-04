@@ -29,9 +29,9 @@ import ComplianceChart from "./compliance-chart"
 import RecentActivityList from "./recent-activity-list"
 
 export const metadata: Metadata = {
-  title: "Superadmin Dashboard | Lagos Property Map",
-  description: "Superadmin dashboard for the Lagos Property Map system",
-}
+  title: "Dashboard",
+  description: "General overview of properties and users",
+};
 
 export default function SuperadminDashboardPage() {
   return (

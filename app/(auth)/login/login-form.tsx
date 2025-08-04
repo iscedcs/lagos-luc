@@ -1,42 +1,27 @@
 "use client";
 
+import { useRouter } from "next/navigation"; // App Router
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { loginUser } from "../../../actions/actions";
-import { signIn } from "@/auth";
 import { signInAction } from "@/actions/auth";
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
 });
 
 export default function LoginForm() {
@@ -44,7 +29,7 @@ export default function LoginForm() {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       email: "",
       password: "",
@@ -53,42 +38,13 @@ export default function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-
     try {
       const result = await signInAction(values.email, values.password);
-
-      // if (result.success) {
-      //   // Redirect based on user type
-      //   switch (values.userType) {
-      //     case "superadmin":
-      //       router.push("/dashboard");
-      //       break;
-      //     case "admin":
-      //       router.push("/dashboard");
-      //       break;
-      //     case "agent":
-      //       router.push("/agent/dashboard");
-      //       break;
-      //     case "owner":
-      //       router.push("/owner/dashboard");
-      //       break;
-      //     default:
-      //       router.push("/");
-      //   }
-      // } else {
-      //   // Handle error
-      //   form.setError("root", {
-      //     message: result.message || "Invalid credentials. Please try again.",
-      //   });
-      // }
-
-      console.log({result})
-    } catch (error) {
-      console.error("Login error:", error);
+      router.push(result.callBackUrl ?? "/dashboard"); // use the callbackUrl or default
+    } catch (error: any) {
       form.setError("root", {
-        message: "An unexpected error occurred. Please try again.",
+        message: error.message || "An unexpected error occurred.",
       });
-    } finally {
       setIsLoading(false);
     }
   }
@@ -101,7 +57,6 @@ export default function LoginForm() {
             {form.formState.errors.root.message}
           </div>
         )}
-
         <FormField
           control={form.control}
           name="email"
@@ -135,7 +90,8 @@ export default function LoginForm() {
         <Button
           type="submit"
           className="w-full bg-emerald-600 hover:bg-emerald-700"
-          disabled={isLoading}>
+          disabled={isLoading}
+        >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Log In
         </Button>

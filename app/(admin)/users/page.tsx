@@ -4,10 +4,18 @@ import { AddUserButton } from "./add-user-button";
 import { UserRoleFilter } from "./user-role-filter";
 import { UserStatusFilter } from "./user-status-filter";
 import { SearchInput } from "../components/search-input";
+import { Metadata } from "next";
+import { getAllUsers } from "@/actions/users";
 
-export default function UsersManagementPage() {
+export const metadata: Metadata = {
+  title: "Users",
+  description: "Manage system users and property owners",
+};
+
+export default async function UsersManagementPage() {
+  const allUsers = await getAllUsers();
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
@@ -39,15 +47,15 @@ export default function UsersManagementPage() {
         </div>
 
         <TabsContent value="all" className="m-0">
-          <UsersDataTable userType="all" />
+          <UsersDataTable usersData={allUsers} role="all" />
         </TabsContent>
 
         <TabsContent value="admins" className="m-0">
-          <UsersDataTable userType="admin" />
+          <UsersDataTable usersData={allUsers} role="admin" />
         </TabsContent>
 
         <TabsContent value="owners" className="m-0">
-          <UsersDataTable userType="owner" />
+          <UsersDataTable usersData={allUsers} role="owner" />
         </TabsContent>
       </Tabs>
     </div>

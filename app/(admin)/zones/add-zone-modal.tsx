@@ -24,7 +24,7 @@ const formSchema = z.object({
     message: "Zone name must be at least 2 characters.",
   }),
   zoneType: z.string({
-    required_error: "Please select a zone type.",
+    message: "Please select a zone type.",
   }),
   residentialRate: z.string().refine((val) => !isNaN(Number.parseFloat(val)), {
     message: "Residential rate must be a number.",
@@ -35,13 +35,13 @@ const formSchema = z.object({
   industrialRate: z.string().refine((val) => !isNaN(Number.parseFloat(val)), {
     message: "Industrial rate must be a number.",
   }),
-})
+});
 
 export default function AddZoneModal() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       zoneName: "",
       zoneType: "",
@@ -49,13 +49,13 @@ export default function AddZoneModal() {
       commercialRate: "0.8",
       industrialRate: "0.6",
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // In a real app, you would submit this data to your backend
-    console.log(values)
-    setOpen(false)
-    form.reset()
+    console.log(values);
+    setOpen(false);
+    form.reset();
   }
 
   return (
@@ -69,7 +69,10 @@ export default function AddZoneModal() {
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Add New Zone</DialogTitle>
-          <DialogDescription>Create a new property zone with tax rates for different property types.</DialogDescription>
+          <DialogDescription>
+            Create a new property zone with tax rates for different property
+            types.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -82,7 +85,9 @@ export default function AddZoneModal() {
                   <FormControl>
                     <Input placeholder="e.g. Ikoyi" {...field} />
                   </FormControl>
-                  <FormDescription>Enter the name of the geographical zone.</FormDescription>
+                  <FormDescription>
+                    Enter the name of the geographical zone.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -94,7 +99,10 @@ export default function AddZoneModal() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Zone Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select zone type" />
@@ -106,7 +114,9 @@ export default function AddZoneModal() {
                       <SelectItem value="developing">Developing</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormDescription>Select the type of zone for classification purposes.</FormDescription>
+                  <FormDescription>
+                    Select the type of zone for classification purposes.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -157,7 +167,11 @@ export default function AddZoneModal() {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Save Zone</Button>
@@ -166,6 +180,6 @@ export default function AddZoneModal() {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 

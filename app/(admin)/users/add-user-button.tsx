@@ -28,7 +28,7 @@ const formSchema = z
       message: "Please enter a valid email address.",
     }),
     role: z.string({
-      required_error: "Please select a role.",
+      message: "Please select a role.",
     }),
     password: z.string().min(8, {
       message: "Password must be at least 8 characters.",
@@ -38,26 +38,26 @@ const formSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  })
+  });
 
 export function AddUserButton() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       name: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // In a real app, this would call a server action to create the user
-    console.log(values)
-    setOpen(false)
-    form.reset()
+    console.log(values);
+    setOpen(false);
+    form.reset();
   }
 
   return (
@@ -71,7 +71,9 @@ export function AddUserButton() {
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
-          <DialogDescription>Create a new user account in the system.</DialogDescription>
+          <DialogDescription>
+            Create a new user account in the system.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -107,7 +109,10 @@ export function AddUserButton() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a role" />
@@ -117,10 +122,14 @@ export function AddUserButton() {
                       <SelectItem value="super-admin">Super Admin</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="auditor">Auditor</SelectItem>
-                      <SelectItem value="property-owner">Property Owner</SelectItem>
+                      <SelectItem value="property-owner">
+                        Property Owner
+                      </SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormDescription>This determines the user's permissions in the system.</FormDescription>
+                  <FormDescription>
+                    This determines the user's permissions in the system.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -134,7 +143,9 @@ export function AddUserButton() {
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
-                  <FormDescription>Must be at least 8 characters.</FormDescription>
+                  <FormDescription>
+                    Must be at least 8 characters.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -153,7 +164,11 @@ export function AddUserButton() {
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create User</Button>
@@ -162,6 +177,6 @@ export function AddUserButton() {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 

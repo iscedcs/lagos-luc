@@ -17,60 +17,64 @@ import { AlertCircle, CheckCircle2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const formSchema = z.object({
-  selectionMethod: z.enum(["filter", "list", "zone"], { required_error: "Please select a method" }),
+  selectionMethod: z.enum(["filter", "list", "zone"], {
+    message: "Please select a method",
+  }),
   propertyType: z.string().optional(),
   zone: z.string().optional(),
   status: z.string().optional(),
   propertyIds: z.string().optional(),
-  updateField: z.string({ required_error: "Please select a field to update" }),
-  updateValue: z.string({ required_error: "Please enter a value" }),
+  updateField: z.string({ message: "Please select a field to update" }),
+  updateValue: z.string({ message: "Please enter a value" }),
   notifyOwners: z.boolean().default(false),
-  reason: z.string().min(10, { message: "Reason must be at least 10 characters" }),
-})
+  reason: z
+    .string()
+    .min(10, { message: "Reason must be at least 10 characters" }),
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 export default function BulkUpdateForm() {
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [updateProgress, setUpdateProgress] = useState(0)
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState(0);
   const [updateResult, setUpdateResult] = useState<{
-    status: "success" | "error" | null
-    message: string
+    status: "success" | "error" | null;
+    message: string;
     details?: {
-      total: number
-      updated: number
-      skipped: number
-    }
-  }>({ status: null, message: "" })
+      total: number;
+      updated: number;
+      skipped: number;
+    };
+  }>({ status: null, message: "" });
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       selectionMethod: "filter",
       notifyOwners: false,
       reason: "",
     },
-  })
+  });
 
-  const selectionMethod = form.watch("selectionMethod")
+  const selectionMethod = form.watch("selectionMethod");
 
   async function onSubmit(data: FormValues) {
-    setIsUpdating(true)
-    setUpdateProgress(0)
-    setUpdateResult({ status: null, message: "" })
+    setIsUpdating(true);
+    setUpdateProgress(0);
+    setUpdateResult({ status: null, message: "" });
 
     // Simulate update process with progress
-    const totalSteps = 10
+    const totalSteps = 10;
     for (let i = 1; i <= totalSteps; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      setUpdateProgress((i / totalSteps) * 100)
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setUpdateProgress((i / totalSteps) * 100);
     }
 
     // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Simulate successful update
-    setIsUpdating(false)
+    setIsUpdating(false);
     setUpdateResult({
       status: "success",
       message: "Properties updated successfully",
@@ -79,7 +83,7 @@ export default function BulkUpdateForm() {
         updated: 75,
         skipped: 3,
       },
-    })
+    });
 
     // In a real implementation, you would:
     // 1. Send the form data to a server action
@@ -92,7 +96,8 @@ export default function BulkUpdateForm() {
       <CardHeader>
         <CardTitle>Bulk Update Properties</CardTitle>
         <CardDescription>
-          Update multiple properties at once by applying the same change to all selected properties.
+          Update multiple properties at once by applying the same change to all
+          selected properties.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -114,19 +119,25 @@ export default function BulkUpdateForm() {
                         <FormControl>
                           <RadioGroupItem value="filter" />
                         </FormControl>
-                        <FormLabel className="font-normal">Filter Properties</FormLabel>
+                        <FormLabel className="font-normal">
+                          Filter Properties
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="list" />
                         </FormControl>
-                        <FormLabel className="font-normal">List Property IDs</FormLabel>
+                        <FormLabel className="font-normal">
+                          List Property IDs
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="zone" />
                         </FormControl>
-                        <FormLabel className="font-normal">Select by Zone</FormLabel>
+                        <FormLabel className="font-normal">
+                          Select by Zone
+                        </FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -143,14 +154,19 @@ export default function BulkUpdateForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Property Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select property type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="residential">Residential</SelectItem>
+                          <SelectItem value="residential">
+                            Residential
+                          </SelectItem>
                           <SelectItem value="commercial">Commercial</SelectItem>
                           <SelectItem value="industrial">Industrial</SelectItem>
                           <SelectItem value="mixed-use">Mixed Use</SelectItem>
@@ -167,7 +183,10 @@ export default function BulkUpdateForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select status" />
@@ -191,7 +210,10 @@ export default function BulkUpdateForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Zone</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select zone" />
@@ -225,7 +247,9 @@ export default function BulkUpdateForm() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>Example: LAG-001, LAG-002, LAG-003</FormDescription>
+                    <FormDescription>
+                      Example: LAG-001, LAG-002, LAG-003
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -239,7 +263,10 @@ export default function BulkUpdateForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Zone</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select zone" />
@@ -252,7 +279,9 @@ export default function BulkUpdateForm() {
                         <SelectItem value="zone-d">Zone D</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>All properties in the selected zone will be updated.</FormDescription>
+                    <FormDescription>
+                      All properties in the selected zone will be updated.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -268,7 +297,10 @@ export default function BulkUpdateForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Field to Update</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select field" />
@@ -278,8 +310,12 @@ export default function BulkUpdateForm() {
                           <SelectItem value="status">Status</SelectItem>
                           <SelectItem value="zone">Zone</SelectItem>
                           <SelectItem value="taxRate">Tax Rate</SelectItem>
-                          <SelectItem value="valuationDate">Valuation Date</SelectItem>
-                          <SelectItem value="propertyClass">Property Classification</SelectItem>
+                          <SelectItem value="valuationDate">
+                            Valuation Date
+                          </SelectItem>
+                          <SelectItem value="propertyClass">
+                            Property Classification
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -316,7 +352,9 @@ export default function BulkUpdateForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>This will be recorded in the audit log.</FormDescription>
+                  <FormDescription>
+                    This will be recorded in the audit log.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -328,11 +366,16 @@ export default function BulkUpdateForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel>Notify Property Owners</FormLabel>
-                    <FormDescription>Send notifications to property owners about this update.</FormDescription>
+                    <FormDescription>
+                      Send notifications to property owners about this update.
+                    </FormDescription>
                   </div>
                 </FormItem>
               )}
@@ -349,19 +392,29 @@ export default function BulkUpdateForm() {
             )}
 
             {updateResult.status && (
-              <Alert variant={updateResult.status === "success" ? "default" : "destructive"}>
+              <Alert
+                variant={
+                  updateResult.status === "success" ? "default" : "destructive"
+                }
+              >
                 {updateResult.status === "success" ? (
                   <CheckCircle2 className="h-4 w-4" />
                 ) : (
                   <AlertCircle className="h-4 w-4" />
                 )}
-                <AlertTitle>{updateResult.status === "success" ? "Update Successful" : "Update Failed"}</AlertTitle>
+                <AlertTitle>
+                  {updateResult.status === "success"
+                    ? "Update Successful"
+                    : "Update Failed"}
+                </AlertTitle>
                 <AlertDescription>
                   {updateResult.message}
                   {updateResult.details && (
                     <div className="mt-2 text-sm">
                       <p>Total properties: {updateResult.details.total}</p>
-                      <p>Successfully updated: {updateResult.details.updated}</p>
+                      <p>
+                        Successfully updated: {updateResult.details.updated}
+                      </p>
                       <p>Skipped: {updateResult.details.skipped}</p>
                     </div>
                   )}
@@ -382,10 +435,13 @@ export default function BulkUpdateForm() {
       </CardContent>
       <CardFooter className="bg-gray-50 border-t px-6 py-3">
         <div className="text-xs text-gray-500">
-          <p>Bulk updates are logged in the system audit trail and can be reviewed in the compliance section.</p>
+          <p>
+            Bulk updates are logged in the system audit trail and can be
+            reviewed in the compliance section.
+          </p>
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
 

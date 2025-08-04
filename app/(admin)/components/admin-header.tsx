@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Bell, ChevronDown, Menu, Search, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AdminSidebar from "./admin-sidebar";
+import { SignOutButton } from "./sign-out-button";
 
 export default function AdminHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -73,10 +73,7 @@ export default function AdminHeader() {
                 className="flex items-center gap-2"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src="/placeholder.svg?height=32&width=32"
-                    alt="User"
-                  />
+                  <AvatarImage src="https://i.pravatar.cc/32" alt="User" />
                   <AvatarFallback>SA</AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-sm font-medium">
@@ -97,9 +94,7 @@ export default function AdminHeader() {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/login">Log out</Link>
-              </DropdownMenuItem>
+              <SignOutButton />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -18,21 +18,29 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const formSchema = z.object({
-  notificationType: z.enum(["email", "sms", "both"], { required_error: "Please select a notification type" }),
-  recipientType: z.enum(["all", "zone", "status", "custom"], { required_error: "Please select recipient type" }),
+  notificationType: z.enum(["email", "sms", "both"], {
+    message: "Please select a notification type",
+  }),
+  recipientType: z.enum(["all", "zone", "status", "custom"], {
+    message: "Please select recipient type",
+  }),
   zone: z.string().optional(),
   status: z.string().optional(),
   customRecipients: z.string().optional(),
-  subject: z.string().min(5, { message: "Subject must be at least 5 characters" }),
-  message: z.string().min(20, { message: "Message must be at least 20 characters" }),
+  subject: z
+    .string()
+    .min(5, { message: "Subject must be at least 5 characters" }),
+  message: z
+    .string()
+    .min(20, { message: "Message must be at least 20 characters" }),
   template: z.string().optional(),
   includeAttachment: z.boolean().default(false),
   scheduleSend: z.boolean().default(false),
   scheduleDate: z.string().optional(),
   scheduleTime: z.string().optional(),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 // Mock notification templates
 const notificationTemplates = [
@@ -41,24 +49,24 @@ const notificationTemplates = [
   { id: "template-3", name: "Document Submission Request" },
   { id: "template-4", name: "Property Assessment Notice" },
   { id: "template-5", name: "System Maintenance Alert" },
-]
+];
 
 export default function BulkNotificationForm() {
-  const [isSending, setIsSending] = useState(false)
-  const [sendProgress, setSendProgress] = useState(0)
+  const [isSending, setIsSending] = useState(false);
+  const [sendProgress, setSendProgress] = useState(0);
   const [sendResult, setSendResult] = useState<{
-    status: "success" | "error" | null
-    message: string
+    status: "success" | "error" | null;
+    message: string;
     details?: {
-      total: number
-      sent: number
-      failed: number
-    }
-  }>({ status: null, message: "" })
-  const [activeTab, setActiveTab] = useState("compose")
+      total: number;
+      sent: number;
+      failed: number;
+    };
+  }>({ status: null, message: "" });
+  const [activeTab, setActiveTab] = useState("compose");
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       notificationType: "email",
       recipientType: "all",
@@ -67,50 +75,50 @@ export default function BulkNotificationForm() {
       includeAttachment: false,
       scheduleSend: false,
     },
-  })
+  });
 
-  const recipientType = form.watch("recipientType")
-  const scheduleSend = form.watch("scheduleSend")
-  const selectedTemplate = form.watch("template")
+  const recipientType = form.watch("recipientType");
+  const scheduleSend = form.watch("scheduleSend");
+  const selectedTemplate = form.watch("template");
 
   // Handle template selection
   const handleTemplateSelect = (templateId: string) => {
-    form.setValue("template", templateId)
+    form.setValue("template", templateId);
 
     // In a real app, you would fetch the template content from the server
     // For this example, we'll just set some placeholder content
     if (templateId === "template-1") {
-      form.setValue("subject", "Reminder: Property Tax Payment Due")
+      form.setValue("subject", "Reminder: Property Tax Payment Due");
       form.setValue(
         "message",
-        "Dear Property Owner,\n\nThis is a friendly reminder that your property tax payment is due on [DUE_DATE]. Please ensure timely payment to avoid any penalties.\n\nThank you,\nLagos Property Management",
-      )
+        "Dear Property Owner,\n\nThis is a friendly reminder that your property tax payment is due on [DUE_DATE]. Please ensure timely payment to avoid any penalties.\n\nThank you,\nLagos Property Management"
+      );
     } else if (templateId === "template-2") {
-      form.setValue("subject", "Property Verification Complete")
+      form.setValue("subject", "Property Verification Complete");
       form.setValue(
         "message",
-        "Dear Property Owner,\n\nWe are pleased to inform you that the verification process for your property has been completed successfully. You can now access your property certificate through your account dashboard.\n\nRegards,\nLagos Property Management",
-      )
+        "Dear Property Owner,\n\nWe are pleased to inform you that the verification process for your property has been completed successfully. You can now access your property certificate through your account dashboard.\n\nRegards,\nLagos Property Management"
+      );
     }
-  }
+  };
 
   async function onSubmit(data: FormValues) {
-    setIsSending(true)
-    setSendProgress(0)
-    setSendResult({ status: null, message: "" })
+    setIsSending(true);
+    setSendProgress(0);
+    setSendResult({ status: null, message: "" });
 
     // Simulate sending process with progress
-    const totalSteps = 10
+    const totalSteps = 10;
     for (let i = 1; i <= totalSteps; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      setSendProgress((i / totalSteps) * 100)
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setSendProgress((i / totalSteps) * 100);
     }
 
     // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Simulate successful sending
-    setIsSending(false)
+    setIsSending(false);
     setSendResult({
       status: "success",
       message: "Notifications sent successfully",
@@ -119,7 +127,7 @@ export default function BulkNotificationForm() {
         sent: 123,
         failed: 2,
       },
-    })
+    });
 
     // In a real implementation, you would:
     // 1. Send the form data to a server action
@@ -131,7 +139,9 @@ export default function BulkNotificationForm() {
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Bulk Notifications</CardTitle>
-        <CardDescription>Send notifications to multiple property owners at once.</CardDescription>
+        <CardDescription>
+          Send notifications to multiple property owners at once.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="compose" onValueChange={setActiveTab}>
@@ -141,7 +151,10 @@ export default function BulkNotificationForm() {
           </TabsList>
           <TabsContent value="compose">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6 mt-4"
+              >
                 <FormField
                   control={form.control}
                   name="notificationType"
@@ -185,16 +198,23 @@ export default function BulkNotificationForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Recipients</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select recipients" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="all">All Property Owners</SelectItem>
+                          <SelectItem value="all">
+                            All Property Owners
+                          </SelectItem>
                           <SelectItem value="zone">By Zone</SelectItem>
-                          <SelectItem value="status">By Property Status</SelectItem>
+                          <SelectItem value="status">
+                            By Property Status
+                          </SelectItem>
                           <SelectItem value="custom">Custom List</SelectItem>
                         </SelectContent>
                       </Select>
@@ -210,7 +230,10 @@ export default function BulkNotificationForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Zone</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select zone" />
@@ -223,7 +246,9 @@ export default function BulkNotificationForm() {
                             <SelectItem value="zone-d">Zone D</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormDescription>Send to all property owners in the selected zone.</FormDescription>
+                        <FormDescription>
+                          Send to all property owners in the selected zone.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -237,22 +262,34 @@ export default function BulkNotificationForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Property Status</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="registered">Registered</SelectItem>
-                            <SelectItem value="pending">Pending Verification</SelectItem>
+                            <SelectItem value="registered">
+                              Registered
+                            </SelectItem>
+                            <SelectItem value="pending">
+                              Pending Verification
+                            </SelectItem>
                             <SelectItem value="verified">Verified</SelectItem>
-                            <SelectItem value="tax-due">Tax Payment Due</SelectItem>
-                            <SelectItem value="tax-overdue">Tax Payment Overdue</SelectItem>
+                            <SelectItem value="tax-due">
+                              Tax Payment Due
+                            </SelectItem>
+                            <SelectItem value="tax-overdue">
+                              Tax Payment Overdue
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormDescription>
-                          Send to all property owners with properties in the selected status.
+                          Send to all property owners with properties in the
+                          selected status.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -275,7 +312,8 @@ export default function BulkNotificationForm() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Enter email addresses or property IDs. For example: john@example.com, LAG-001, LAG-002
+                          Enter email addresses or property IDs. For example:
+                          john@example.com, LAG-001, LAG-002
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -290,7 +328,10 @@ export default function BulkNotificationForm() {
                     <FormItem>
                       <FormLabel>Subject</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter notification subject" {...field} />
+                        <Input
+                          placeholder="Enter notification subject"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -304,11 +345,16 @@ export default function BulkNotificationForm() {
                     <FormItem>
                       <FormLabel>Message</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Enter your notification message" className="min-h-[200px]" {...field} />
+                        <Textarea
+                          placeholder="Enter your notification message"
+                          className="min-h-[200px]"
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>
-                        You can use placeholders like [OWNER_NAME], [PROPERTY_ID], [DUE_DATE] which will be replaced
-                        with actual values.
+                        You can use placeholders like [OWNER_NAME],
+                        [PROPERTY_ID], [DUE_DATE] which will be replaced with
+                        actual values.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -321,12 +367,16 @@ export default function BulkNotificationForm() {
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                       <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>Include Property Certificate</FormLabel>
                         <FormDescription>
-                          Attach the property certificate to the notification (only applicable for verified properties).
+                          Attach the property certificate to the notification
+                          (only applicable for verified properties).
                         </FormDescription>
                       </div>
                     </FormItem>
@@ -339,11 +389,16 @@ export default function BulkNotificationForm() {
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                       <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>Schedule Sending</FormLabel>
-                        <FormDescription>Schedule this notification to be sent at a later time.</FormDescription>
+                        <FormDescription>
+                          Schedule this notification to be sent at a later time.
+                        </FormDescription>
                       </div>
                     </FormItem>
                   )}
@@ -392,13 +447,23 @@ export default function BulkNotificationForm() {
                 )}
 
                 {sendResult.status && (
-                  <Alert variant={sendResult.status === "success" ? "default" : "destructive"}>
+                  <Alert
+                    variant={
+                      sendResult.status === "success"
+                        ? "default"
+                        : "destructive"
+                    }
+                  >
                     {sendResult.status === "success" ? (
                       <CheckCircle2 className="h-4 w-4" />
                     ) : (
                       <AlertCircle className="h-4 w-4" />
                     )}
-                    <AlertTitle>{sendResult.status === "success" ? "Notifications Sent" : "Failed to Send"}</AlertTitle>
+                    <AlertTitle>
+                      {sendResult.status === "success"
+                        ? "Notifications Sent"
+                        : "Failed to Send"}
+                    </AlertTitle>
                     <AlertDescription>
                       {sendResult.message}
                       {sendResult.details && (
@@ -417,7 +482,11 @@ export default function BulkNotificationForm() {
                     Cancel
                   </Button>
                   <Button type="submit" disabled={isSending}>
-                    {scheduleSend ? "Schedule Notification" : isSending ? "Sending..." : "Send Notification"}
+                    {scheduleSend
+                      ? "Schedule Notification"
+                      : isSending
+                      ? "Sending..."
+                      : "Send Notification"}
                   </Button>
                 </div>
               </form>
@@ -430,7 +499,9 @@ export default function BulkNotificationForm() {
                   <div
                     key={template.id}
                     className={`border rounded-md p-4 cursor-pointer transition-colors ${
-                      selectedTemplate === template.id ? "bg-primary/10 border-primary" : "hover:bg-gray-50"
+                      selectedTemplate === template.id
+                        ? "bg-primary/10 border-primary"
+                        : "hover:bg-gray-50"
                     }`}
                     onClick={() => handleTemplateSelect(template.id)}
                   >
@@ -457,9 +528,14 @@ export default function BulkNotificationForm() {
                     </div>
                     <div>
                       <p className="text-sm font-medium">Message:</p>
-                      <p className="text-sm whitespace-pre-line">{form.getValues("message")}</p>
+                      <p className="text-sm whitespace-pre-line">
+                        {form.getValues("message")}
+                      </p>
                     </div>
-                    <Button onClick={() => setActiveTab("compose")} className="w-full">
+                    <Button
+                      onClick={() => setActiveTab("compose")}
+                      className="w-full"
+                    >
                       Continue with this template
                     </Button>
                   </div>
@@ -471,10 +547,13 @@ export default function BulkNotificationForm() {
       </CardContent>
       <CardFooter className="bg-gray-50 border-t px-6 py-3">
         <div className="text-xs text-gray-500">
-          <p>All notifications are logged and can be reviewed in the notification center.</p>
+          <p>
+            All notifications are logged and can be reviewed in the notification
+            center.
+          </p>
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
 

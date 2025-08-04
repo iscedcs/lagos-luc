@@ -9,7 +9,6 @@ import {
   ChevronDown,
   FileText,
   LayoutDashboard,
-  LogOut,
   MapPin,
   Settings,
   Users,
@@ -27,6 +26,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { SignOutButton } from "./sign-out-button";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -341,16 +341,7 @@ export default function AdminSidebar() {
         </div>
       </ScrollArea>
       <div className="border-t p-4">
-        <Button
-          variant="outline"
-          className="w-full justify-start text-red-600"
-          asChild
-        >
-          <Link href="/login">
-            <LogOut className="mr-2 h-4 w-4" />
-            Log Out
-          </Link>
-        </Button>
+        <SignOutButton />
       </div>
     </div>
   );

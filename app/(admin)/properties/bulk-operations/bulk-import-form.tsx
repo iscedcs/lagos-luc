@@ -18,55 +18,59 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const formSchema = z.object({
   file: z.instanceof(File, { message: "Please select a file" }),
-  importType: z.enum(["new", "update"], { required_error: "Please select an import type" }),
-  dataFormat: z.enum(["csv", "excel", "json"], { required_error: "Please select a data format" }),
+  importType: z.enum(["new", "update"], {
+    message: "Please select an import type",
+  }),
+  dataFormat: z.enum(["csv", "excel", "json"], {
+    message: "Please select a data format",
+  }),
   skipValidation: z.boolean().default(false),
   notifyOwners: z.boolean().default(false),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 export default function BulkImportForm() {
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadResult, setUploadResult] = useState<{
-    status: "success" | "error" | null
-    message: string
+    status: "success" | "error" | null;
+    message: string;
     details?: {
-      total: number
-      imported: number
-      errors: number
-      warnings: number
-    }
-  }>({ status: null, message: "" })
+      total: number;
+      imported: number;
+      errors: number;
+      warnings: number;
+    };
+  }>({ status: null, message: "" });
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       importType: "new",
       dataFormat: "csv",
       skipValidation: false,
       notifyOwners: false,
     },
-  })
+  });
 
   async function onSubmit(data: FormValues) {
-    setIsUploading(true)
-    setUploadProgress(0)
-    setUploadResult({ status: null, message: "" })
+    setIsUploading(true);
+    setUploadProgress(0);
+    setUploadResult({ status: null, message: "" });
 
     // Simulate file upload with progress
-    const totalSteps = 10
+    const totalSteps = 10;
     for (let i = 1; i <= totalSteps; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      setUploadProgress((i / totalSteps) * 100)
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setUploadProgress((i / totalSteps) * 100);
     }
 
     // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Simulate successful import
-    setIsUploading(false)
+    setIsUploading(false);
     setUploadResult({
       status: "success",
       message: "Properties imported successfully",
@@ -76,7 +80,7 @@ export default function BulkImportForm() {
         errors: 3,
         warnings: 1,
       },
-    })
+    });
 
     // In a real implementation, you would:
     // 1. Create a FormData object
@@ -86,9 +90,9 @@ export default function BulkImportForm() {
   }
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      form.setValue("file", file)
+      form.setValue("file", file);
     }
   }
 
@@ -96,7 +100,9 @@ export default function BulkImportForm() {
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Bulk Import Properties</CardTitle>
-        <CardDescription>Import multiple properties at once using a CSV, Excel, or JSON file.</CardDescription>
+        <CardDescription>
+          Import multiple properties at once using a CSV, Excel, or JSON file.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -111,8 +117,12 @@ export default function BulkImportForm() {
                     <FormControl>
                       <div className="flex flex-col items-center">
                         <FileSpreadsheet className="h-10 w-10 text-gray-400 mb-2" />
-                        <p className="text-sm font-medium mb-2">Drag and drop your file here, or click to browse</p>
-                        <p className="text-xs text-gray-500 mb-4">Supports CSV, Excel, and JSON formats</p>
+                        <p className="text-sm font-medium mb-2">
+                          Drag and drop your file here, or click to browse
+                        </p>
+                        <p className="text-xs text-gray-500 mb-4">
+                          Supports CSV, Excel, and JSON formats
+                        </p>
                         <Input
                           {...fieldProps}
                           id="file-upload"
@@ -124,7 +134,9 @@ export default function BulkImportForm() {
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={() => document.getElementById("file-upload")?.click()}
+                          onClick={() =>
+                            document.getElementById("file-upload")?.click()
+                          }
                           className="mb-2"
                         >
                           <Upload className="mr-2 h-4 w-4" />
@@ -132,7 +144,8 @@ export default function BulkImportForm() {
                         </Button>
                         {value instanceof File && (
                           <p className="text-sm text-gray-600 mt-2">
-                            Selected: {value.name} ({(value.size / 1024).toFixed(2)} KB)
+                            Selected: {value.name} (
+                            {(value.size / 1024).toFixed(2)} KB)
                           </p>
                         )}
                       </div>
@@ -150,7 +163,10 @@ export default function BulkImportForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Import Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select import type" />
@@ -158,10 +174,15 @@ export default function BulkImportForm() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="new">New Properties</SelectItem>
-                        <SelectItem value="update">Update Existing Properties</SelectItem>
+                        <SelectItem value="update">
+                          Update Existing Properties
+                        </SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>Choose whether to import new properties or update existing ones.</FormDescription>
+                    <FormDescription>
+                      Choose whether to import new properties or update existing
+                      ones.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -173,7 +194,10 @@ export default function BulkImportForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Data Format</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select data format" />
@@ -185,7 +209,9 @@ export default function BulkImportForm() {
                         <SelectItem value="json">JSON</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>Select the format of your import file.</FormDescription>
+                    <FormDescription>
+                      Select the format of your import file.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -199,11 +225,17 @@ export default function BulkImportForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Skip Validation</FormLabel>
-                      <FormDescription>Import properties without validating data (not recommended).</FormDescription>
+                      <FormDescription>
+                        Import properties without validating data (not
+                        recommended).
+                      </FormDescription>
                     </div>
                   </FormItem>
                 )}
@@ -215,11 +247,16 @@ export default function BulkImportForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Notify Property Owners</FormLabel>
-                      <FormDescription>Send notifications to property owners after import.</FormDescription>
+                      <FormDescription>
+                        Send notifications to property owners after import.
+                      </FormDescription>
                     </div>
                   </FormItem>
                 )}
@@ -237,19 +274,29 @@ export default function BulkImportForm() {
             )}
 
             {uploadResult.status && (
-              <Alert variant={uploadResult.status === "success" ? "default" : "destructive"}>
+              <Alert
+                variant={
+                  uploadResult.status === "success" ? "default" : "destructive"
+                }
+              >
                 {uploadResult.status === "success" ? (
                   <CheckCircle2 className="h-4 w-4" />
                 ) : (
                   <AlertCircle className="h-4 w-4" />
                 )}
-                <AlertTitle>{uploadResult.status === "success" ? "Import Successful" : "Import Failed"}</AlertTitle>
+                <AlertTitle>
+                  {uploadResult.status === "success"
+                    ? "Import Successful"
+                    : "Import Failed"}
+                </AlertTitle>
                 <AlertDescription>
                   {uploadResult.message}
                   {uploadResult.details && (
                     <div className="mt-2 text-sm">
                       <p>Total records: {uploadResult.details.total}</p>
-                      <p>Successfully imported: {uploadResult.details.imported}</p>
+                      <p>
+                        Successfully imported: {uploadResult.details.imported}
+                      </p>
                       <p>Errors: {uploadResult.details.errors}</p>
                       <p>Warnings: {uploadResult.details.warnings}</p>
                     </div>
@@ -285,6 +332,6 @@ export default function BulkImportForm() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
 

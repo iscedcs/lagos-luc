@@ -19,22 +19,40 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 const formSchema = z.object({
-  verificationMethod: z.enum(["pending", "zone", "list", "file"], { required_error: "Please select a method" }),
+  verificationMethod: z.enum(["pending", "zone", "list", "file"], {
+    message: "Please select a method",
+  }),
   zone: z.string().optional(),
   propertyIds: z.string().optional(),
   file: z.instanceof(File).optional(),
-  verificationAction: z.enum(["approve", "reject", "flag"], { required_error: "Please select an action" }),
-  verificationNote: z.string().min(10, { message: "Note must be at least 10 characters" }),
+  verificationAction: z.enum(["approve", "reject", "flag"], {
+    message: "Please select an action",
+  }),
+  verificationNote: z
+    .string()
+    .min(10, { message: "Note must be at least 10 characters" }),
   generateCertificates: z.boolean().default(false),
   notifyOwners: z.boolean().default(true),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 // Mock data for pending properties
 const pendingProperties = [
-  { id: "LAG-1001", address: "123 Lagos Ave", type: "Residential", owner: "John Doe", submittedDate: "2023-04-15" },
-  { id: "LAG-1002", address: "456 Ikeja Blvd", type: "Commercial", owner: "Jane Smith", submittedDate: "2023-04-16" },
+  {
+    id: "LAG-1001",
+    address: "123 Lagos Ave",
+    type: "Residential",
+    owner: "John Doe",
+    submittedDate: "2023-04-15",
+  },
+  {
+    id: "LAG-1002",
+    address: "456 Ikeja Blvd",
+    type: "Commercial",
+    owner: "Jane Smith",
+    submittedDate: "2023-04-16",
+  },
   {
     id: "LAG-1003",
     address: "789 Victoria Island",
@@ -49,26 +67,32 @@ const pendingProperties = [
     owner: "Mary Williams",
     submittedDate: "2023-04-18",
   },
-  { id: "LAG-1005", address: "654 Ajah Road", type: "Commercial", owner: "David Brown", submittedDate: "2023-04-19" },
-]
+  {
+    id: "LAG-1005",
+    address: "654 Ajah Road",
+    type: "Commercial",
+    owner: "David Brown",
+    submittedDate: "2023-04-19",
+  },
+];
 
 export default function BulkVerificationForm() {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [processProgress, setProcessProgress] = useState(0)
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processProgress, setProcessProgress] = useState(0);
   const [processResult, setProcessResult] = useState<{
-    status: "success" | "error" | null
-    message: string
+    status: "success" | "error" | null;
+    message: string;
     details?: {
-      total: number
-      approved: number
-      rejected: number
-      flagged: number
-    }
-  }>({ status: null, message: "" })
-  const [selectedProperties, setSelectedProperties] = useState<string[]>([])
+      total: number;
+      approved: number;
+      rejected: number;
+      flagged: number;
+    };
+  }>({ status: null, message: "" });
+  const [selectedProperties, setSelectedProperties] = useState<string[]>([]);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       verificationMethod: "pending",
       verificationAction: "approve",
@@ -76,50 +100,52 @@ export default function BulkVerificationForm() {
       generateCertificates: false,
       notifyOwners: true,
     },
-  })
+  });
 
-  const verificationMethod = form.watch("verificationMethod")
+  const verificationMethod = form.watch("verificationMethod");
 
   function handleSelectAll(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.checked) {
-      setSelectedProperties(pendingProperties.map((prop) => prop.id))
+      setSelectedProperties(pendingProperties.map((prop) => prop.id));
     } else {
-      setSelectedProperties([])
+      setSelectedProperties([]);
     }
   }
 
   function handleSelectProperty(id: string) {
     if (selectedProperties.includes(id)) {
-      setSelectedProperties(selectedProperties.filter((propId) => propId !== id))
+      setSelectedProperties(
+        selectedProperties.filter((propId) => propId !== id)
+      );
     } else {
-      setSelectedProperties([...selectedProperties, id])
+      setSelectedProperties([...selectedProperties, id]);
     }
   }
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      form.setValue("file", file)
+      form.setValue("file", file);
     }
   }
 
   async function onSubmit(data: FormValues) {
-    setIsProcessing(true)
-    setProcessProgress(0)
-    setProcessResult({ status: null, message: "" })
+    setIsProcessing(true);
+    setProcessProgress(0);
+    setProcessResult({ status: null, message: "" });
 
     // Simulate verification process with progress
-    const totalSteps = 10
+    const totalSteps = 10;
     for (let i = 1; i <= totalSteps; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      setProcessProgress((i / totalSteps) * 100)
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setProcessProgress((i / totalSteps) * 100);
     }
 
     // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Simulate successful verification
-    setIsProcessing(false)
+    setIsProcessing(false);
     setProcessResult({
       status: "success",
       message: "Properties verified successfully",
@@ -129,7 +155,7 @@ export default function BulkVerificationForm() {
         rejected: 3,
         flagged: 1,
       },
-    })
+    });
 
     // In a real implementation, you would:
     // 1. Send the form data and selected properties to a server action
@@ -142,7 +168,8 @@ export default function BulkVerificationForm() {
       <CardHeader>
         <CardTitle>Bulk Verification</CardTitle>
         <CardDescription>
-          Verify multiple properties at once to approve, reject, or flag for further review.
+          Verify multiple properties at once to approve, reject, or flag for
+          further review.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -154,20 +181,27 @@ export default function BulkVerificationForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Verification Method</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select method" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="pending">Pending Properties</SelectItem>
+                      <SelectItem value="pending">
+                        Pending Properties
+                      </SelectItem>
                       <SelectItem value="zone">By Zone</SelectItem>
                       <SelectItem value="list">Property ID List</SelectItem>
                       <SelectItem value="file">Upload File</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormDescription>Choose how you want to select properties for verification.</FormDescription>
+                  <FormDescription>
+                    Choose how you want to select properties for verification.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -181,16 +215,20 @@ export default function BulkVerificationForm() {
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="select-all"
-                        onCheckedChange={(checked) => {
+                        onCheckedChange={(checked: boolean) => {
                           if (typeof checked === "boolean") {
                             if (checked) {
-                              setSelectedProperties(pendingProperties.map((prop) => prop.id))
+                              setSelectedProperties(
+                                pendingProperties.map((prop) => prop.id)
+                              );
                             } else {
-                              setSelectedProperties([])
+                              setSelectedProperties([]);
                             }
                           }
                         }}
-                        checked={selectedProperties.length === pendingProperties.length}
+                        checked={
+                          selectedProperties.length === pendingProperties.length
+                        }
                       />
                       <label htmlFor="select-all" className="text-sm">
                         Select All
@@ -215,7 +253,9 @@ export default function BulkVerificationForm() {
                         <TableCell>
                           <Checkbox
                             checked={selectedProperties.includes(property.id)}
-                            onCheckedChange={() => handleSelectProperty(property.id)}
+                            onCheckedChange={() =>
+                              handleSelectProperty(property.id)
+                            }
                           />
                         </TableCell>
                         <TableCell>{property.id}</TableCell>
@@ -228,7 +268,8 @@ export default function BulkVerificationForm() {
                   </TableBody>
                 </Table>
                 <div className="p-4 border-t bg-gray-50 text-sm text-gray-500">
-                  Showing {pendingProperties.length} pending properties. {selectedProperties.length} selected.
+                  Showing {pendingProperties.length} pending properties.{" "}
+                  {selectedProperties.length} selected.
                 </div>
               </div>
             )}
@@ -240,7 +281,10 @@ export default function BulkVerificationForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Zone</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select zone" />
@@ -253,7 +297,10 @@ export default function BulkVerificationForm() {
                         <SelectItem value="zone-d">Zone D</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>All pending properties in the selected zone will be processed.</FormDescription>
+                    <FormDescription>
+                      All pending properties in the selected zone will be
+                      processed.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -274,7 +321,9 @@ export default function BulkVerificationForm() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>Example: LAG-001, LAG-002, LAG-003</FormDescription>
+                    <FormDescription>
+                      Example: LAG-001, LAG-002, LAG-003
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -292,8 +341,12 @@ export default function BulkVerificationForm() {
                       <FormControl>
                         <div className="flex flex-col items-center">
                           <FileText className="h-10 w-10 text-gray-400 mb-2" />
-                          <p className="text-sm font-medium mb-2">Upload a file with property IDs</p>
-                          <p className="text-xs text-gray-500 mb-4">Supports CSV, Excel, and text formats</p>
+                          <p className="text-sm font-medium mb-2">
+                            Upload a file with property IDs
+                          </p>
+                          <p className="text-xs text-gray-500 mb-4">
+                            Supports CSV, Excel, and text formats
+                          </p>
                           <Input
                             {...fieldProps}
                             id="file-upload"
@@ -305,7 +358,9 @@ export default function BulkVerificationForm() {
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => document.getElementById("file-upload")?.click()}
+                            onClick={() =>
+                              document.getElementById("file-upload")?.click()
+                            }
                             className="mb-2"
                           >
                             <Upload className="mr-2 h-4 w-4" />
@@ -313,7 +368,8 @@ export default function BulkVerificationForm() {
                           </Button>
                           {value instanceof File && (
                             <p className="text-sm text-gray-600 mt-2">
-                              Selected: {value.name} ({(value.size / 1024).toFixed(2)} KB)
+                              Selected: {value.name} (
+                              {(value.size / 1024).toFixed(2)} KB)
                             </p>
                           )}
                         </div>
@@ -334,7 +390,10 @@ export default function BulkVerificationForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Action</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select action" />
@@ -378,12 +437,16 @@ export default function BulkVerificationForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Generate Certificates</FormLabel>
                       <FormDescription>
-                        Automatically generate property certificates for approved properties.
+                        Automatically generate property certificates for
+                        approved properties.
                       </FormDescription>
                     </div>
                   </FormItem>
@@ -396,12 +459,16 @@ export default function BulkVerificationForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Notify Property Owners</FormLabel>
                       <FormDescription>
-                        Send notifications to property owners about the verification result.
+                        Send notifications to property owners about the
+                        verification result.
                       </FormDescription>
                     </div>
                   </FormItem>
@@ -420,14 +487,20 @@ export default function BulkVerificationForm() {
             )}
 
             {processResult.status && (
-              <Alert variant={processResult.status === "success" ? "default" : "destructive"}>
+              <Alert
+                variant={
+                  processResult.status === "success" ? "default" : "destructive"
+                }
+              >
                 {processResult.status === "success" ? (
                   <CheckCircle2 className="h-4 w-4" />
                 ) : (
                   <AlertCircle className="h-4 w-4" />
                 )}
                 <AlertTitle>
-                  {processResult.status === "success" ? "Verification Successful" : "Verification Failed"}
+                  {processResult.status === "success"
+                    ? "Verification Successful"
+                    : "Verification Failed"}
                 </AlertTitle>
                 <AlertDescription>
                   {processResult.message}
@@ -449,7 +522,11 @@ export default function BulkVerificationForm() {
               </Button>
               <Button
                 type="submit"
-                disabled={isProcessing || (verificationMethod === "pending" && selectedProperties.length === 0)}
+                disabled={
+                  isProcessing ||
+                  (verificationMethod === "pending" &&
+                    selectedProperties.length === 0)
+                }
               >
                 {isProcessing ? "Processing..." : "Process Verification"}
               </Button>
@@ -459,10 +536,13 @@ export default function BulkVerificationForm() {
       </CardContent>
       <CardFooter className="bg-gray-50 border-t px-6 py-3">
         <div className="text-xs text-gray-500">
-          <p>All verification actions are logged in the system audit trail for compliance purposes.</p>
+          <p>
+            All verification actions are logged in the system audit trail for
+            compliance purposes.
+          </p>
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
 
