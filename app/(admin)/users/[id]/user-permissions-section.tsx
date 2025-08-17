@@ -10,22 +10,18 @@ import { Shield, ShieldAlert } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface UserPermissionsProps {
-  user: {
-    id: string
-    name: string
-    role: string
-  }
+  user: UserInterface;
 }
 
 export function UserPermissionsSection({ user }: UserPermissionsProps) {
-  const [role, setRole] = useState(user.role)
-  const [changesSaved, setChangesSaved] = useState(false)
+  const [role, setRole] = useState(user.role);
+  const [changesSaved, setChangesSaved] = useState(false);
 
   const handleSaveChanges = () => {
     // In a real app, this would call a server action to update permissions
-    setChangesSaved(true)
-    setTimeout(() => setChangesSaved(false), 3000)
-  }
+    setChangesSaved(true);
+    setTimeout(() => setChangesSaved(false), 3000);
+  };
 
   return (
     <div className="space-y-6">
@@ -35,7 +31,9 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
             <Shield className="h-5 w-5" />
             <CardTitle>User Role</CardTitle>
           </div>
-          <CardDescription>Manage the user's role and system access level</CardDescription>
+          <CardDescription>
+            Manage the user's role and system access level
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -46,10 +44,10 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Super Admin">Super Admin</SelectItem>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Auditor">Auditor</SelectItem>
-                  <SelectItem value="Property Owner">Property Owner</SelectItem>
+                  <SelectItem value="SUPERADMIN">Super Admin</SelectItem>
+                  <SelectItem value="AdmADMINin">Admin</SelectItem>
+                  <SelectItem value="AUDITOR">Auditor</SelectItem>
+                  <SelectItem value="PROPERTY_OWNER">Property Owner</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -59,7 +57,8 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
                 <ShieldAlert className="h-4 w-4" />
                 <AlertTitle>Warning</AlertTitle>
                 <AlertDescription>
-                  Super Admin has full access to all system features and data. Assign with caution.
+                  Super Admin has full access to all system features and data.
+                  Assign with caution.
                 </AlertDescription>
               </Alert>
             )}
@@ -70,14 +69,18 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
       <Card>
         <CardHeader>
           <CardTitle>Permission Details</CardTitle>
-          <CardDescription>Customize specific permissions for this user</CardDescription>
+          <CardDescription>
+            Customize specific permissions for this user
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             {changesSaved && (
               <Alert className="bg-green-50 text-green-800 border-green-200">
                 <AlertTitle>Changes saved</AlertTitle>
-                <AlertDescription>User permissions have been updated successfully.</AlertDescription>
+                <AlertDescription>
+                  User permissions have been updated successfully.
+                </AlertDescription>
               </Alert>
             )}
 
@@ -89,16 +92,27 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
                   <Label htmlFor="view-properties">View Properties</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="edit-properties" defaultChecked={role !== "Property Owner"} />
+                  <Checkbox
+                    id="edit-properties"
+                    defaultChecked={role !== "Property Owner"}
+                  />
                   <Label htmlFor="edit-properties">Edit Properties</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="delete-properties" defaultChecked={role === "Super Admin"} />
+                  <Checkbox
+                    id="delete-properties"
+                    defaultChecked={role === "Super Admin"}
+                  />
                   <Label htmlFor="delete-properties">Delete Properties</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="approve-properties" defaultChecked={role !== "Property Owner"} />
-                  <Label htmlFor="approve-properties">Approve Property Registrations</Label>
+                  <Checkbox
+                    id="approve-properties"
+                    defaultChecked={role !== "Property Owner"}
+                  />
+                  <Label htmlFor="approve-properties">
+                    Approve Property Registrations
+                  </Label>
                 </div>
               </div>
             </div>
@@ -107,15 +121,24 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
               <h3 className="text-sm font-medium">User Management</h3>
               <div className="grid gap-3">
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="view-users" defaultChecked={role !== "Property Owner"} />
+                  <Checkbox
+                    id="view-users"
+                    defaultChecked={role !== "Property Owner"}
+                  />
                   <Label htmlFor="view-users">View Users</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="edit-users" defaultChecked={role === "Super Admin" || role === "Admin"} />
+                  <Checkbox
+                    id="edit-users"
+                    defaultChecked={role === "Super Admin" || role === "Admin"}
+                  />
                   <Label htmlFor="edit-users">Edit Users</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="delete-users" defaultChecked={role === "Super Admin"} />
+                  <Checkbox
+                    id="delete-users"
+                    defaultChecked={role === "Super Admin"}
+                  />
                   <Label htmlFor="delete-users">Delete Users</Label>
                 </div>
               </div>
@@ -125,15 +148,24 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
               <h3 className="text-sm font-medium">System Configuration</h3>
               <div className="grid gap-3">
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="view-config" defaultChecked={role === "Super Admin" || role === "Admin"} />
+                  <Checkbox
+                    id="view-config"
+                    defaultChecked={role === "Super Admin" || role === "Admin"}
+                  />
                   <Label htmlFor="view-config">View System Configuration</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="edit-config" defaultChecked={role === "Super Admin"} />
+                  <Checkbox
+                    id="edit-config"
+                    defaultChecked={role === "Super Admin"}
+                  />
                   <Label htmlFor="edit-config">Edit System Configuration</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="manage-zones" defaultChecked={role === "Super Admin" || role === "Admin"} />
+                  <Checkbox
+                    id="manage-zones"
+                    defaultChecked={role === "Super Admin" || role === "Admin"}
+                  />
                   <Label htmlFor="manage-zones">Manage Property Zones</Label>
                 </div>
               </div>
@@ -145,6 +177,6 @@ export function UserPermissionsSection({ user }: UserPermissionsProps) {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
 

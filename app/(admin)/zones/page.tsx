@@ -7,19 +7,25 @@ import ZonesMap from "./zones-map"
 import ZonesTable from "./zones-table"
 import ZoneRatesTable from "./zone-rates-table"
 import AddZoneModal from "./add-zone-modal"
+import { getAllZones } from "@/actions/zones";
 
 export const metadata: Metadata = {
   title: "Property Zones | Lagos Property Map",
-  description: "Manage property zones and areas in the Lagos Property Map system",
-}
+  description:
+    "Manage property zones and areas in the Lagos Property Map system",
+};
 
-export default function PropertyZonesPage() {
+export default async function PropertyZonesPage() {
+  const zoneData = await getAllZones();
+  console.log(zoneData);
   return (
     <div className="flex-1 space-y-6 p-6 md:p-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Property Zones</h2>
-          <p className="text-muted-foreground">Manage geographical zones and their valuation rates</p>
+          <p className="text-muted-foreground">
+            Manage geographical zones and their valuation rates
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="h-9">
@@ -42,7 +48,7 @@ export default function PropertyZonesPage() {
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{zoneData.count}</div>
             <p className="text-xs text-muted-foreground">Across Lagos State</p>
           </CardContent>
         </Card>
@@ -54,7 +60,9 @@ export default function PropertyZonesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">6</div>
-            <p className="text-xs text-muted-foreground">High-value property areas</p>
+            <p className="text-xs text-muted-foreground">
+              High-value property areas
+            </p>
           </CardContent>
         </Card>
 
@@ -65,7 +73,9 @@ export default function PropertyZonesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0.45%</div>
-            <p className="text-xs text-muted-foreground">Average LUC rate across zones</p>
+            <p className="text-xs text-muted-foreground">
+              Average LUC rate across zones
+            </p>
           </CardContent>
         </Card>
 
@@ -76,7 +86,9 @@ export default function PropertyZonesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">Last: 15 days ago</div>
-            <p className="text-xs text-muted-foreground">Last zone boundary update</p>
+            <p className="text-xs text-muted-foreground">
+              Last zone boundary update
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -85,7 +97,9 @@ export default function PropertyZonesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Zone Map</CardTitle>
-          <CardDescription>Geographical view of property zones in Lagos</CardDescription>
+          <CardDescription>
+            Geographical view of property zones in Lagos
+          </CardDescription>
         </CardHeader>
         <CardContent className="h-[400px]">
           <ZonesMap />
@@ -100,7 +114,7 @@ export default function PropertyZonesPage() {
         </TabsList>
 
         <TabsContent value="zones" className="mt-6">
-          <ZonesTable />
+          <ZonesTable zoneData={zoneData} />
         </TabsContent>
 
         <TabsContent value="rates" className="mt-6">
@@ -108,6 +122,6 @@ export default function PropertyZonesPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 

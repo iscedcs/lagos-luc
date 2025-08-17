@@ -4,25 +4,25 @@ import { axiosRequest, lucClient } from "@/axios-client";
 import { API_ROUTE } from "@/lib/const";
 import { AxiosError } from "axios";
 
-export async function getAllUsers() {
+export async function getAllZones() {
   try {
-    const allUsersResponse = await axiosRequest(
+    const allZonesResponse = await axiosRequest(
       lucClient,
       {
-        url: API_ROUTE.user.all,
+        url: API_ROUTE.zone.all,
         method: "GET",
       },
       true
     );
 
-    const userData: UserDataInterface = allUsersResponse.data.data;
+    const zoneData: ZoneDataInterface = allZonesResponse.data.data;
 
-    return userData;
+    return zoneData;
   } catch (error) {
     if (error instanceof AxiosError) {
       console.error(error.response?.data.message);
       return {
-        users: [] as UserInterface[],
+        zones: [] as ZoneInterface[],
         count: 0,
         pagination: {
           limit: 10,
@@ -30,9 +30,9 @@ export async function getAllUsers() {
         },
       };
     } else {
-      console.error("Error fetching all users:", error);
+      console.error("Error fetching all zones:", error);
       return {
-        users: [] as UserInterface[],
+        zones: [] as ZoneInterface[],
         count: 0,
         pagination: {
           limit: 10,
@@ -43,26 +43,26 @@ export async function getAllUsers() {
   }
 }
 
-export async function getUserById(id: string) {
+export async function getZoneById(id: string) {
   try {
-    const getUserByIdResponse = await axiosRequest(
+    const getZoneByIdResponse = await axiosRequest(
       lucClient,
       {
         method: "GET",
-        url: API_ROUTE.user.one.replace("{id}", id),
+        url: API_ROUTE.zone.one.replace("{id}", id),
       },
       true
     );
-    const user: UserInterface = getUserByIdResponse.data.data;
-    if (!user) {
+    const zone: ZoneInterface = getZoneByIdResponse.data.data;
+    if (!zone) {
       return {
         success: false,
-        error: "No user data found",
+        error: "No zone data found",
       };
     }
     return {
       success: true,
-      user,
+      zone,
     };
   } catch (e) {
     if (e instanceof AxiosError) {

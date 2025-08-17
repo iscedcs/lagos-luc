@@ -15,86 +15,18 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react"
 
-// Mock data for zones
-const MOCK_ZONES = [
-  {
-    id: 1,
-    name: "Ikoyi",
-    properties: 1245,
-    status: "active",
-    lastUpdated: "2023-12-15",
-    taxRate: 0.75,
-    averageValue: "₦450M",
-  },
-  {
-    id: 2,
-    name: "Victoria Island",
-    properties: 1876,
-    status: "active",
-    lastUpdated: "2023-12-10",
-    taxRate: 0.8,
-    averageValue: "₦520M",
-  },
-  {
-    id: 3,
-    name: "Lekki Phase 1",
-    properties: 2134,
-    status: "active",
-    lastUpdated: "2023-12-05",
-    taxRate: 0.65,
-    averageValue: "₦380M",
-  },
-  {
-    id: 4,
-    name: "Ikeja",
-    properties: 3245,
-    status: "active",
-    lastUpdated: "2023-11-28",
-    taxRate: 0.5,
-    averageValue: "₦220M",
-  },
-  {
-    id: 5,
-    name: "Surulere",
-    properties: 4532,
-    status: "active",
-    lastUpdated: "2023-11-20",
-    taxRate: 0.45,
-    averageValue: "₦180M",
-  },
-  {
-    id: 6,
-    name: "Yaba",
-    properties: 2876,
-    status: "active",
-    lastUpdated: "2023-11-15",
-    taxRate: 0.5,
-    averageValue: "₦210M",
-  },
-  {
-    id: 7,
-    name: "Ajah",
-    properties: 1543,
-    status: "active",
-    lastUpdated: "2023-11-10",
-    taxRate: 0.4,
-    averageValue: "₦150M",
-  },
-  {
-    id: 8,
-    name: "Apapa",
-    properties: 987,
-    status: "under-review",
-    lastUpdated: "2023-11-05",
-    taxRate: 0.6,
-    averageValue: "₦280M",
-  },
-]
 
-export default function ZonesTable() {
-  const [searchTerm, setSearchTerm] = useState("")
+export default function ZonesTable({
+  zoneData,
+}: {
+  zoneData: ZoneDataInterface;
+}) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [zones, setZones] = useState<ZoneInterface[]>(zoneData.zones);
 
-  const filteredZones = MOCK_ZONES.filter((zone) => zone.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredZones = zones.filter((zone) =>
+    zone.zoneName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-4">
@@ -126,15 +58,18 @@ export default function ZonesTable() {
             {filteredZones.map((zone) => (
               <TableRow key={zone.id}>
                 <TableCell className="font-medium">{zone.id}</TableCell>
-                <TableCell>{zone.name}</TableCell>
-                <TableCell>{zone.properties.toLocaleString()}</TableCell>
+                <TableCell>{zone.zoneName}</TableCell>
+                {/* TODO: <TableCell>{zone.properties.toLocaleString()}</TableCell> */}
+                <TableCell>{Math.floor(Math.random() * 1000)}</TableCell>
                 <TableCell>
-                  <Badge variant={zone.status === "active" ? "default" : "secondary"}>
+                  <Badge
+                    variant={zone.status === "active" ? "default" : "secondary"}
+                  >
                     {zone.status === "active" ? "Active" : "Under Review"}
                   </Badge>
                 </TableCell>
                 <TableCell>{zone.taxRate}%</TableCell>
-                <TableCell>{zone.averageValue}</TableCell>
+                <TableCell>{zone.avgPropertyValue}</TableCell>
                 <TableCell>{zone.lastUpdated}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -168,6 +103,6 @@ export default function ZonesTable() {
         </Table>
       </div>
     </div>
-  )
+  );
 }
 

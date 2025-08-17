@@ -8,24 +8,22 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { AlertTriangle, Check, Key, Shield } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { toast } from "sonner";
 
 interface UserSecuritySectionProps {
-  user: {
-    id: string
-    name: string
-    email: string
-  }
+  user: UserInterface;
 }
 
 export function UserSecuritySection({ user }: UserSecuritySectionProps) {
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
-  const [passwordResetSent, setPasswordResetSent] = useState(false)
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [passwordResetSent, setPasswordResetSent] = useState(false);
 
   const handlePasswordReset = () => {
     // In a real app, this would call a server action to send a password reset email
-    setPasswordResetSent(true)
-    setTimeout(() => setPasswordResetSent(false), 5000)
-  }
+    setPasswordResetSent(true);
+    toast.success("Password reset email sent successfully");
+    setTimeout(() => setPasswordResetSent(false), 5000);
+  };
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -35,14 +33,18 @@ export function UserSecuritySection({ user }: UserSecuritySectionProps) {
             <Key className="h-5 w-5" />
             <CardTitle>Password Management</CardTitle>
           </div>
-          <CardDescription>Manage user password and reset options</CardDescription>
+          <CardDescription>
+            Manage user password and reset options
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {passwordResetSent && (
             <Alert className="bg-green-50 text-green-800 border-green-200">
               <Check className="h-4 w-4" />
               <AlertTitle>Password reset email sent</AlertTitle>
-              <AlertDescription>A password reset link has been sent to {user.email}</AlertDescription>
+              <AlertDescription>
+                A password reset link has been sent to {user.email}
+              </AlertDescription>
             </Alert>
           )}
 
@@ -63,7 +65,9 @@ export function UserSecuritySection({ user }: UserSecuritySectionProps) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handlePasswordReset}>Send Password Reset Email</Button>
+          <Button onClick={handlePasswordReset}>
+            Send Password Reset Email
+          </Button>
         </CardFooter>
       </Card>
 
@@ -73,20 +77,30 @@ export function UserSecuritySection({ user }: UserSecuritySectionProps) {
             <Shield className="h-5 w-5" />
             <CardTitle>Security Settings</CardTitle>
           </div>
-          <CardDescription>Manage account security and authentication options</CardDescription>
+          <CardDescription>
+            Manage account security and authentication options
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="two-factor">Two-factor authentication</Label>
-              <div className="text-sm text-muted-foreground">Add an extra layer of security to your account</div>
+              <div className="text-sm text-muted-foreground">
+                Add an extra layer of security to your account
+              </div>
             </div>
-            <Switch id="two-factor" checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
+            <Switch
+              id="two-factor"
+              checked={twoFactorEnabled}
+              onCheckedChange={setTwoFactorEnabled}
+            />
           </div>
 
           {twoFactorEnabled && (
             <div className="space-y-4 pt-2">
-              <div className="text-sm font-medium">Setup two-factor authentication</div>
+              <div className="text-sm font-medium">
+                Setup two-factor authentication
+              </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone-2fa">Phone number for 2FA</Label>
                 <Input id="phone-2fa" placeholder="+1 (555) 123-4567" />
@@ -115,6 +129,6 @@ export function UserSecuritySection({ user }: UserSecuritySectionProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 

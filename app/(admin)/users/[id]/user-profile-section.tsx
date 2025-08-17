@@ -10,45 +10,37 @@ import { Badge } from "@/components/ui/badge"
 import { Edit2, Upload } from "lucide-react"
 
 interface UserProfileSectionProps {
-  user: {
-    id: string
-    name: string
-    email: string
-    role: string
-    status: string
-    phone: string
-    department: string
-    joinDate: string
-    avatarUrl: string
-  }
+  user: UserInterface;
 }
 
 export function UserProfileSection({ user }: UserProfileSectionProps) {
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    }).format(date)
-  }
+    }).format(date);
+  };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (
+    status: "active" | "inactive" | "pending" | "suspended"
+  ) => {
     switch (status.toLowerCase()) {
       case "active":
-        return "bg-green-100 text-green-800 hover:bg-green-200"
+        return "bg-green-100 text-green-800 hover:bg-green-200";
       case "inactive":
-        return "bg-gray-100 text-gray-800 hover:bg-gray-200"
+        return "bg-gray-100 text-gray-800 hover:bg-gray-200";
       case "pending":
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
       case "suspended":
-        return "bg-red-100 text-red-800 hover:bg-red-200"
+        return "bg-red-100 text-red-800 hover:bg-red-200";
       default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-200"
+        return "bg-gray-100 text-gray-800 hover:bg-gray-200";
     }
-  }
+  };
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -56,7 +48,11 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
             <CardTitle>User Profile</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+            >
               <Edit2 className="h-4 w-4 mr-2" />
               {isEditing ? "Cancel" : "Edit"}
             </Button>
@@ -66,12 +62,12 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center space-y-3">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
+              <AvatarImage
+                src={"https://i.pravatar.cc/150"}
+                alt={user.firstName}
+              />
               <AvatarFallback className="text-lg">
-                {user.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+                {user.firstName[0] + user.lastName[0]}
               </AvatarFallback>
             </Avatar>
             {isEditing && (
@@ -85,12 +81,25 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
           <div className="space-y-4">
             <div className="grid gap-3">
               <Label htmlFor="name">Full Name</Label>
-              {isEditing ? <Input id="name" defaultValue={user.name} /> : <div className="text-sm">{user.name}</div>}
+              {isEditing ? (
+                <Input
+                  id="name"
+                  defaultValue={user.firstName + " " + user.lastName}
+                />
+              ) : (
+                <div className="text-sm">
+                  {user.firstName + " " + user.lastName}
+                </div>
+              )}
             </div>
 
             <div className="grid gap-3">
               <Label htmlFor="email">Email Address</Label>
-              {isEditing ? <Input id="email" defaultValue={user.email} /> : <div className="text-sm">{user.email}</div>}
+              {isEditing ? (
+                <Input id="email" defaultValue={user.email} />
+              ) : (
+                <div className="text-sm">{user.email}</div>
+              )}
             </div>
 
             <div className="grid gap-3">
@@ -102,7 +111,7 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
               )}
             </div>
 
-            {user.department && (
+            {/* {user.department && (
               <div className="grid gap-3">
                 <Label htmlFor="department">Department</Label>
                 {isEditing ? (
@@ -111,7 +120,7 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
                   <div className="text-sm">{user.department}</div>
                 )}
               </div>
-            )}
+            )} */}
           </div>
         </CardContent>
         {isEditing && (
@@ -132,25 +141,34 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <div className="text-sm font-medium text-muted-foreground">User ID</div>
+              <div className="text-sm font-medium text-muted-foreground">
+                User ID
+              </div>
               <div className="text-sm">{user.id}</div>
             </div>
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Join Date</div>
-              <div className="text-sm">{formatDate(user.joinDate)}</div>
+              <div className="text-sm font-medium text-muted-foreground">
+                Join Date
+              </div>
+              <div className="text-sm">{formatDate(user.createdAt)}</div>
             </div>
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Role</div>
+              <div className="text-sm font-medium text-muted-foreground">
+                Role
+              </div>
               <Badge variant="outline">{user.role}</Badge>
             </div>
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Status</div>
-              <Badge className={getStatusColor(user.status)}>{user.status}</Badge>
+              <div className="text-sm font-medium text-muted-foreground">
+                Status
+              </div>
+              {/* TODO: <Badge className={getStatusColor("active")}>{user.status}</Badge> */}
+              <Badge className={getStatusColor("active")}>Active</Badge>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
