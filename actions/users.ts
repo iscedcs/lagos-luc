@@ -42,3 +42,26 @@ export async function getAllUsers() {
     }
   }
 }
+
+export async function getUserProfile() {
+  try {
+    const userProfileResponse = await axiosRequest(
+      lucClient,
+      {
+        url: `${API_ROUTE.user.profile}`,
+        method: "GET",
+      },
+      true
+    );    
+    const userProfile: UserInterface = userProfileResponse.data.data;
+    return userProfile;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return null;
+    } else {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+  }
+}

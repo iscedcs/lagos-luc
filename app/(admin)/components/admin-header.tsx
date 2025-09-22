@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import AdminSidebar from "./admin-sidebar";
 import { SignOutButton } from "./sign-out-button";
+import Link from "next/link";
 
-export default function AdminHeader() {
+export default function AdminHeader({ user }: { user: UserInterface | null }) {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
@@ -36,9 +37,8 @@ export default function AdminHeader() {
 
       <div className="w-full flex items-center gap-4 md:gap-8">
         <form
-          className={`relative ${
-            searchOpen ? "flex-1" : "hidden md:block md:flex-1"
-          }`}
+          className={`relative ${searchOpen ? "flex-1" : "hidden md:block md:flex-1"
+            }`}
         >
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -65,38 +65,44 @@ export default function AdminHeader() {
             <span className="absolute right-1 top-1 flex h-2 w-2 rounded-full bg-red-600"></span>
           </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://i.pravatar.cc/32" alt="User" />
-                  <AvatarFallback>SA</AvatarFallback>
-                </Avatar>
-                <div className="hidden md:block text-sm font-medium">
-                  David Adeyemi
-                </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <SignOutButton />
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://i.pravatar.cc/32" alt="User" />
+                    <AvatarFallback>{user?.firstName[0] + user?.lastName[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="hidden md:block text-sm font-medium">
+                    {user.firstName} {user.lastName}
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <SignOutButton />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant={'outline'}>Sign In</Button>
+          )}
         </div>
       </div>
     </div>
