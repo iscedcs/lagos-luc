@@ -10,11 +10,7 @@ import { Shield, ShieldAlert } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface UserPermissionsProps {
-  user: {
-    id: string
-    name: string
-    role: string
-  }
+  user: UserInterface
 }
 
 export function UserPermissionsSection({ user }: UserPermissionsProps) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,48 +8,63 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Edit2, Upload } from "lucide-react"
+import { formatDate, getInitials } from "@/lib/utils"
+import { UpdateUser } from "@/actions/users"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface UserProfileSectionProps {
-  user: {
-    id: string
-    name: string
-    email: string
-    role: string
-    status: string
-    phone: string
-    department: string
-    joinDate: string
-    avatarUrl: string
-  }
+  user: UserInterface,
+  status?: string
+  department?: string
+  avatarUrl?: string
 }
 
-export function UserProfileSection({ user }: UserProfileSectionProps) {
+export function UserProfileSection({ user, avatarUrl, department, status }: UserProfileSectionProps) {
   const [isEditing, setIsEditing] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const [formState, setFormState] = useState({
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    phone: user.phone || "",
+    // department: user.department || "",
+  })
+  const router = useRouter()
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(date)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setFormState((prev) => ({
+      ...prev,
+      [id]: value,
+    }))
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
-        return "bg-green-100 text-green-800 hover:bg-green-200"
-      case "inactive":
-        return "bg-gray-100 text-gray-800 hover:bg-gray-200"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-      case "suspended":
-        return "bg-red-100 text-red-800 hover:bg-red-200"
-      default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-200"
-    }
-  }
+  const handleSave = () => {
+    const formData = new FormData()
+    formData.append("firstName", formState.firstName)
+    formData.append("lastName", formState.lastName)
+    formData.append("email", formState.email)
+    formData.append("phone", formState.phone)
+    // formData.append("department", formState.department)
 
+    startTransition(() => {
+      UpdateUser(formData, user.id)
+        .then(({ error }) => {
+          if (error) {
+            toast.error(error)
+            return
+          }
+          toast.success("User updated successfully")
+          setIsEditing(false)
+          router.refresh()
+        })
+        .catch((error) => {
+          toast.error("Failed to update user")
+          console.error("Failed to update user:", error)
+        })
+    })
+  }
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
@@ -66,12 +81,9 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center space-y-3">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
+              <AvatarImage src={avatarUrl ? avatarUrl : 'https://i.pravatar.cc/120'} alt={`${user.firstName}-${user.lastName}-image`} />
               <AvatarFallback className="text-lg">
-                {user.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+                {getInitials(`${user.firstName} ${user.lastName}`)}
               </AvatarFallback>
             </Avatar>
             {isEditing && (
@@ -84,34 +96,40 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
 
           <div className="space-y-4">
             <div className="grid gap-3">
-              <Label htmlFor="name">Full Name</Label>
-              {isEditing ? <Input id="name" defaultValue={user.name} /> : <div className="text-sm">{user.name}</div>}
+              <Label htmlFor="firstName">First Name</Label>
+              {isEditing ? (
+                <Input id="firstName" value={formState.firstName} onChange={handleInputChange} />
+              ) : (
+                <div className="text-sm">{user.firstName}</div>
+              )}
+            </div>
+
+            <div className="grid gap-3">
+              <Label htmlFor="lastName">Last Name</Label>
+              {isEditing ? (
+                <Input id="lastName" value={formState.lastName} onChange={handleInputChange} />
+              ) : (
+                <div className="text-sm">{user.lastName}</div>
+              )}
             </div>
 
             <div className="grid gap-3">
               <Label htmlFor="email">Email Address</Label>
-              {isEditing ? <Input id="email" defaultValue={user.email} /> : <div className="text-sm">{user.email}</div>}
+              {isEditing ? (
+                <Input id="email" value={formState.email} onChange={handleInputChange} />
+              ) : (
+                <div className="text-sm">{user.email}</div>
+              )}
             </div>
 
             <div className="grid gap-3">
               <Label htmlFor="phone">Phone Number</Label>
               {isEditing ? (
-                <Input id="phone" defaultValue={user.phone} />
+                <Input id="phone" value={formState.phone} onChange={handleInputChange} />
               ) : (
                 <div className="text-sm">{user.phone || "Not provided"}</div>
               )}
             </div>
-
-            {user.department && (
-              <div className="grid gap-3">
-                <Label htmlFor="department">Department</Label>
-                {isEditing ? (
-                  <Input id="department" defaultValue={user.department} />
-                ) : (
-                  <div className="text-sm">{user.department}</div>
-                )}
-              </div>
-            )}
           </div>
         </CardContent>
         {isEditing && (
@@ -119,11 +137,12 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
             <Button variant="outline" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>
-            <Button>Save Changes</Button>
+            <Button onClick={handleSave} disabled={isPending}>
+              {isPending ? "Saving..." : "Save Changes"}
+            </Button>
           </CardFooter>
         )}
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Account Information</CardTitle>
@@ -137,16 +156,16 @@ export function UserProfileSection({ user }: UserProfileSectionProps) {
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">Join Date</div>
-              <div className="text-sm">{formatDate(user.joinDate)}</div>
+              <div className="text-sm">{formatDate(user.createdAt)}</div>
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">Role</div>
               <Badge variant="outline">{user.role}</Badge>
             </div>
-            <div>
+            {/* <div>
               <div className="text-sm font-medium text-muted-foreground">Status</div>
               <Badge className={getStatusColor(user.status)}>{user.status}</Badge>
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>

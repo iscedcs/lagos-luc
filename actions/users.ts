@@ -94,3 +94,57 @@ export async function UpdateUserProfile(formData: FormData) {
     }
   }
 }
+
+export async function getUserById(userId: string) {         
+  try {
+    const userResponse = await axiosRequest(
+      lucClient,
+      {
+        url: `${API_ROUTE.user.getUserById.replace("{id}", userId)}`,
+        method: "GET",
+      },
+      true
+    );
+    const user: UserInterface = userResponse.data.data;
+    return user;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return null;
+    } else {
+      console.error("Error fetching user by ID:", error);
+      return null;
+    } 
+  }
+}
+
+export async function UpdateUser (formData: FormData, userId: string) {
+  try {
+    const userResponse = await axiosRequest(
+      lucClient,
+      {
+        url: `${API_ROUTE.user.UpdateUser.replace("{id}", userId)}`,
+        method: "PATCH",
+        data: {
+          firstName: formData.get("firstName"), 
+          lastName: formData.get("lastName"),
+          phone: formData.get("phone"),
+          role: formData.get("role"),
+          isActive: formData.get("isActive") === "true",
+        }
+      },  
+      true
+    );
+    const user: UserInterface = userResponse.data.data;
+    return { user };
+  }
+  catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return { error: error.response?.data.message || "Failed to update user" };
+    } else {
+      console.error("Error updating user:", error);
+      return { error: "Failed to update user" };
+    } 
+} 
+}

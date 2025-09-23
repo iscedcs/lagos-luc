@@ -10,11 +10,7 @@ import { AlertTriangle, Check, Key, Shield } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface UserSecuritySectionProps {
-  user: {
-    id: string
-    name: string
-    email: string
-  }
+  user: UserInterface
 }
 
 export function UserSecuritySection({ user }: UserSecuritySectionProps) {

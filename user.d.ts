@@ -18,3 +18,5 @@ interface UserDataInterface {
     offset: number;
   };
 }
+
+type USER_ROLE = 'SUPERADMIN' | 'ADMIN' | 'USER' | 'PROPERTY_OWNER';
