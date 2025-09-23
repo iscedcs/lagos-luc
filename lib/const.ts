@@ -8,5 +8,6 @@ export const API_ROUTE = {
   user: {
     all: "/api/user",
     profile: "/api/user/me",
+    
   },
 };

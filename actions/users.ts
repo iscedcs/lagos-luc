@@ -52,7 +52,7 @@ export async function getUserProfile() {
         method: "GET",
       },
       true
-    );    
+    );
     const userProfile: UserInterface = userProfileResponse.data.data;
     return userProfile;
   } catch (error) {
@@ -62,6 +62,35 @@ export async function getUserProfile() {
     } else {
       console.error("Error fetching user profile:", error);
       return null;
+    }
+  }
+}
+
+export async function UpdateUserProfile(formData: FormData) {
+  console.log(formData)
+  try {
+    const userProfileResponse = await axiosRequest(
+      lucClient,
+      {
+        url: `${API_ROUTE.user.profile}`,
+        method: "PATCH",
+        data: {
+          firstName: formData.get("firstName"),
+          lastName: formData.get("lastName"),
+          phone: formData.get("phone"),
+        }
+      },
+      true
+    );
+    const userProfile: UserInterface = userProfileResponse.data.data;
+    return { user: userProfile };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return { error: error.response?.data.message || "Failed to update user profile" };
+    } else {
+      console.error("Error updating user profile:", error);
+      return { error: "Failed to update user profile" };
     }
   }
 }
