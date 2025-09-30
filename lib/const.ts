@@ -12,6 +12,11 @@ export const API_ROUTE = {
     profile: "/api/user/me",
     getUserById: "/api/user/one/{id}", 
     UpdateUser: "/api/user/update/{id}",
+    getAllBlackListedAdmins:"/api/user/admins",
+    getAllBlackListedAgents:"/api/user/agents",
+    setNewPasswordForUser: "/api/user/set-new-password",
+
+
     
   },
 };

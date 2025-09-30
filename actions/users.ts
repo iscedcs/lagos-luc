@@ -148,3 +148,106 @@ export async function UpdateUser (formData: FormData, userId: string) {
     } 
 } 
 }
+
+export async function getAllBlackListedAdmins() {
+  try {
+    const allUsersResponse = await axiosRequest(
+      lucClient,
+      {
+        url: API_ROUTE.user.getAllBlackListedAdmins,
+        method: "GET",
+      },
+      true
+    );  
+    const userData: UserDataInterface = allUsersResponse.data.data;
+
+    return userData;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return null;
+    } else {
+      console.error("Error fetching all blacklisted admins:", error);
+      return null;
+    }
+  }
+}
+
+export async function getAllBlackListedAgents() {
+  try {
+    const allUsersResponse = await axiosRequest(
+      lucClient,
+     {
+        url: API_ROUTE.user.getAllBlackListedAgents,
+        method: "GET",
+      }, 
+      true
+    );
+    const userData: UserDataInterface = allUsersResponse.data.data;
+
+    return userData;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return null;
+    } else {
+      console.error("Error fetching all blacklisted agents:", error);
+      return null;
+    }
+  }
+}
+
+export async function softDeleteUser(userId: string) {
+  try {
+    const response = await axiosRequest(
+      lucClient,
+      {
+        url: `${API_ROUTE.user.UpdateUser.replace("{id}", userId)}`,
+        method: "PATCH ",
+      },
+      true
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return { error: error.response?.data.message || "Failed to delete user" };
+    } else {
+      console.error("Error deleting user:", error);
+      return { error: "Failed to delete user" };
+    }   
+  }
+}
+
+export async function setNewPasswordForUser(formData: FormData, userId: string) {
+  try {
+    const newPassword = formData.get("newPassword");
+    const confirmNewPassword = formData.get("confirmNewPassword");
+
+    if (newPassword !== confirmNewPassword) {
+      return { error: "Passwords do not match" };
+    }
+
+    const response = await axiosRequest(
+      lucClient,
+      {
+        url: `${API_ROUTE.user.setNewPasswordForUser.replace("{id}", userId)}`,
+        method: "PATCH",
+        data: {
+          newPassword,
+        },
+      },
+      true
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data.message);
+      return { error: error.response?.data.message || "Failed to set new password" };
+    } else {
+      console.error("Error setting new password:", error);
+      return { error: "Failed to set new password" };
+    }
+  }
+}
