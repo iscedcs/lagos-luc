@@ -6,6 +6,7 @@ import { UserStatusFilter } from "./user-status-filter";
 import { SearchInput } from "../components/search-input";
 import { Metadata } from "next";
 import { getAllUsers } from "@/actions/users";
+import { auth } from "@/auth";
 
 export const metadata: Metadata = {
   title: "Users",
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UsersManagementPage() {
+  const session = await auth()
   const allUsers = await getAllUsers();
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -23,7 +25,7 @@ export default async function UsersManagementPage() {
             Manage system users and property owners
           </p>
         </div>
-        <AddUserButton />
+        <AddUserButton role={session?.user.role!} />
       </div>
 
       <Tabs defaultValue="all" className="w-full">

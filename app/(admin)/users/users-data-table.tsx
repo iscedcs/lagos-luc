@@ -2,6 +2,16 @@
 
 import { useState } from "react";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -30,6 +40,8 @@ import {
   Eye,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { softDeleteUser } from "@/actions/users";
+import { toast } from "sonner";
 interface UsersDataTableProps {
   role: "all" | "admin" | "owner";
   usersData: UserDataInterface;
@@ -38,6 +50,27 @@ interface UsersDataTableProps {
 export function UsersDataTable({ role, usersData }: UsersDataTableProps) {
   const router = useRouter();
   const [users, setUsers] = useState(usersData.users);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      const result = await softDeleteUser(userToDelete);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        setUsers(users.filter(user => user.id !== userToDelete));
+        toast.success("User deleted successfully");
+      }
+    } catch (error) {
+      toast.error("Failed to delete user");
+    } finally {
+      setUserToDelete(null);
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -151,7 +184,9 @@ export function UsersDataTable({ role, usersData }: UsersDataTableProps) {
                           <Eye className="mr-2 h-4 w-4" />
                           View details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                        >
                           <Edit className="mr-2 h-4 w-4" />
                           Edit user
                         </DropdownMenuItem>
@@ -169,7 +204,13 @@ export function UsersDataTable({ role, usersData }: UsersDataTableProps) {
                           Reset password
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem
+                         onClick={() => {
+                            setUserToDelete(user.id);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          className="text-red-600"
+                        >
                           <Trash className="mr-2 h-4 w-4" />
                           Delete user
                         </DropdownMenuItem>
@@ -182,6 +223,23 @@ export function UsersDataTable({ role, usersData }: UsersDataTableProps) {
           )}
         </TableBody>
       </Table>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

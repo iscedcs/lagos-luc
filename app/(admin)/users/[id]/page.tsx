@@ -22,6 +22,7 @@ export default async function UserPage({
   if (!user) {
     notFound();
   }
+  console.log({user})
 
   return (
     <div className="container mx-auto p-6 space-y-6">
