@@ -19,7 +19,13 @@ export function EditProfileButton({ user }: EditProfileButtonProps) {
         Edit Profile
       </Button>
 
-      <EditProfileModal user={user} isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+      <EditProfileModal
+        user={user}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={(updatedUser: UserInterface) => {
+        }}
+      />
     </>
   )
 }

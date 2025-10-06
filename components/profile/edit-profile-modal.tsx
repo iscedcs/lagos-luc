@@ -19,12 +19,12 @@ import { UpdateUserProfile } from "@/actions/users"
 import { useRouter } from "next/navigation"
 
 interface EditProfileModalProps {
-  user: UserInterface
-  isOpen: boolean
-  onClose: () => void
+  user: UserInterface;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (updatedUser: UserInterface) => void;
 }
-
-export function EditProfileModal({ user, isOpen, onClose }: EditProfileModalProps) {
+export function EditProfileModal({ user, isOpen, onClose, onSave }: EditProfileModalProps) {
   const [isPending, startTransition] = useTransition()
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showSuccess, setShowSuccess] = useState(false)

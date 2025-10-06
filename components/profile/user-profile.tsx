@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { EditProfileModal } from "./edit-profile-modal"
-import type { UserInterface } from "@/types/user"
 import { Mail, Phone, Calendar, Edit3 } from "lucide-react"
 
 interface UserProfileProps {
