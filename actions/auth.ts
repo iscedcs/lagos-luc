@@ -27,3 +27,129 @@ export async function signInAction(
 export async function signOutAction() {
   await signOut();
 }
+
+export async function registerPropertyOwner(formData: FormData) {
+  try {
+    const response = await fetch("/api/auth/create", {
+      method: "POST",
+      body: formData,
+    });
+  } catch (error) {
+    console.error("Error registering property owner:", error);
+  }     
+  return { success: true }; 
+}
+
+export async function loginUser(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const callBackUrl = formData.get("callbackUrl") as string || "/dashboard";
+
+  const result = await signIn("credentials", {
+    email,
+    password,
+    redirect: false,
+  });
+
+  if (!result) {
+    throw new Error(result?.error || "Invalid email or password");
+  }
+
+  return {
+    callBackUrl: callBackUrl || "/dashboard",
+    url: result.url,
+  };
+}
+
+export async function changeUserPassword(formData: FormData) {
+  try {
+    const response = await fetch("/api/auth/{email}/reset-password", {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to change password");
+    } 
+    return { success: true };
+  } catch (error) {
+    console.error("Error changing password:", error);
+    return { error: "Failed to change password" };
+  }
+}
+
+export async function requestEmailVerificationCode(email: string) {
+  try {
+    const response = await fetch("/api/auth/request-verify-email-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to request email verification code");
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error requesting email verification code:", error);
+    return { error: "Failed to request email verification code" };
+  }
+}
+
+export async function verifyEmailVerificationCode(email: string, code: string) { 
+  try {
+    const response = await fetch("/api/auth/verify-email-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, code }),
+    }); 
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to verify email code");
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error verifying email code:", error);
+    return { error: "Failed to verify email code" };
+  }
+}
+
+export async function resetPasswordWithPhoneNumber(formData: FormData) {
+  try {
+    const response = await fetch("/api/auth/reset-password-phone", {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to reset password");
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return { error: "Failed to reset password" };
+  }
+}
+export async function sendResetTokenToPhone(formData: FormData) {
+  try {
+    const response = await fetch("/api/auth/send-reset-token-phone", {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to send reset token");
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending reset token:", error);
+    return { error: "Failed to send reset token" };
+  }
+}

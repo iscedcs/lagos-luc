@@ -1,4 +1,5 @@
 import { allAdminUsers, getUserById, UpdateUser } from "@/actions/users";
+import { registerProperty } from "@/app/(admin)/register-property/actions";
 
 export const BASE_URL =
   process.env.BACKEND_URL || "https://land-use-api.onrender.com";
@@ -6,6 +7,17 @@ export const API_ROUTE = {
   auth: {
     login: "/api/auth/login",
     reset: "/api/auth/{email}/reset-password",
+    registerPropertyOwner: "/api/auth/create",
+    loginUser:"/api/auth/login", 
+    changeUserPassword:"/api/auth/{email}/reset-password",
+    requestEmailVerificationCode:"/api/auth/request-verify-email-code",
+    verifyEmailVerificationCode:"/api/auth/verify-email-code",
+    resetPasswordWithPhoneNunmber:"/api/auth/reset-password-phone",
+    sendResetTokenToPhone:"/api/auth/send-reset-token-phone",
+    resetPasswordWithEmail:"/api/auth/reset-password-email",
+    SendResetTokenToEmail:"/api/auth/send-reset-token-email",
+    SignOutCurrentUser:"/api/auth/signout",
+
   },
   user: {
     all: "/api/user",
