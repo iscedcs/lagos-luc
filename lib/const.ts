@@ -1,6 +1,3 @@
-import { allAdminUsers, getUserById, UpdateUser } from "@/actions/users";
-import { registerProperty } from "@/app/(admin)/register-property/actions";
-
 export const BASE_URL =
   process.env.BACKEND_URL || "https://land-use-api.onrender.com";
 export const API_ROUTE = {
@@ -19,7 +16,7 @@ export const API_ROUTE = {
     SignOutCurrentUser:"/api/auth/signout",
 
   },
-  user: {
+  user: {    
     all: "/api/user",
     profile: "/api/user/me",
     getUserById: "/api/user/one/{id}", 

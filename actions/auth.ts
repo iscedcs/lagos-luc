@@ -1,6 +1,11 @@
 "use server";
 
 import { signIn, signOut } from "@/auth";
+import { axiosRequest, lucClient } from "@/axios-client";
+import { API_ROUTE, BASE_URL } from "@/lib/const";
+import { AxiosError } from "axios";
+import { error } from "console";
+import { success } from "zod";
 
 export async function signInAction(
   email: string,
@@ -36,8 +41,8 @@ export async function registerPropertyOwner(formData: FormData) {
     });
   } catch (error) {
     console.error("Error registering property owner:", error);
-  }     
-  return { success: true }; 
+  }
+  return { success: true };
 }
 
 export async function loginUser(formData: FormData) {
@@ -62,19 +67,41 @@ export async function loginUser(formData: FormData) {
 }
 
 export async function changeUserPassword(formData: FormData) {
+  const email = (formData.get("email") as string) || "";
+  const oldPassword = (formData.get("currentPassword") as string) || "";
+  const newPassword = (formData.get("newPassword") as string) || "";
+  console.log({email, oldPassword, newPassword})
+
+  if (!email) {
+    throw new Error("Email is required to change password");
+  }
+
+  if (!oldPassword) {
+    throw new Error("Current password is required");
+  }
+
+  if (!newPassword) {
+    throw new Error("New password is required");
+  }
+
+  const url = `${BASE_URL}${API_ROUTE.auth.changeUserPassword.replace("{email}", encodeURIComponent(email))}`;
+
   try {
-    const response = await fetch("/api/auth/{email}/reset-password", {
-      method: "POST",
-      body: formData,
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to change password");
-    } 
-    return { success: true };
-  } catch (error) {
-    console.error("Error changing password:", error);
-    return { error: "Failed to change password" };
+    const response = await axiosRequest(
+      lucClient,
+      { url, method: "POST", data: { oldPassword, newPassword } },
+      true
+    );
+    console.log("Password change response:", response.data);
+    return {
+      success: true,
+      message: "Password changed successfully",
+    }
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      console.error("Error changing password:", e.message);
+      return { error: e.message }
+    }
   }
 }
 
@@ -99,7 +126,7 @@ export async function requestEmailVerificationCode(email: string) {
   }
 }
 
-export async function verifyEmailVerificationCode(email: string, code: string) { 
+export async function verifyEmailVerificationCode(email: string, code: string) {
   try {
     const response = await fetch("/api/auth/verify-email-code", {
       method: "POST",
@@ -107,7 +134,7 @@ export async function verifyEmailVerificationCode(email: string, code: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, code }),
-    }); 
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -151,5 +178,55 @@ export async function sendResetTokenToPhone(formData: FormData) {
   } catch (error) {
     console.error("Error sending reset token:", error);
     return { error: "Failed to send reset token" };
+  }
+}
+
+export async function resetPasswordWithEmail(formData: FormData) {
+  try {
+    const response = await fetch("/api/auth/reset-password-email", {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to reset password");
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return { error: "Failed to reset password" };
+  }
+}
+
+export async function sendResetTokenToEmail(formData: FormData) {
+  try {
+    const response = await fetch("/api/auth/send-reset-token-email", {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to send reset token");
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending reset token:", error);
+    return { error: "Failed to send reset token" };
+  }
+}
+
+export async function SignOutCurrentUser() {
+  try {
+    const response = await fetch("/api/auth/signout", {
+      method: "POST",
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to sign out");
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("Error signing out:", error);
+    return { error: "Failed to sign out" };
   }
 }

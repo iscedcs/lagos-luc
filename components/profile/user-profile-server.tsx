@@ -1,14 +1,19 @@
+'use client'
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { EditProfileButton } from "./edit-profile-button"
+import { changeUserPassword } from "@/actions/auth"
 import { Mail, Phone, Calendar } from "lucide-react"
-
+import { toast } from "sonner"
+import { useState } from "react"
 interface UserProfileServerProps {
   user: UserInterface
 }
 
 export function UserProfileServer({ user }: UserProfileServerProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -19,6 +24,20 @@ export function UserProfileServer({ user }: UserProfileServerProps) {
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+  }
+
+  async function handleChangePassword(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsLoading(true);
+    const formData = new FormData(event.currentTarget);
+    const result = await changeUserPassword(formData);
+    if (result && result.success) {
+      toast.success(result.message || "Password changed successfully");
+    } else {
+      toast.error(result?.message || "Failed to change password");
+    }
+    setIsLoading(false);
+    return
   }
 
   const getRoleBadgeVariant = (role: string) => {
@@ -122,6 +141,35 @@ export function UserProfileServer({ user }: UserProfileServerProps) {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Change Password */}
+            <div className="mt-8 border-t pt-6">
+              <h3 className="text-lg font-semibold">Change Password</h3>
+              <p className="text-sm text-muted-foreground">Update your account password here.</p>
+
+              <form name="change-password" onSubmit={handleChangePassword} className="mt-4 space-y-4" method="post">
+                <input type="hidden" name="email" value={user.email} />
+
+                <div>
+                  <label className="block text-sm text-muted-foreground">Current password</label>
+                  <input name="currentPassword" type="password" required className="mt-1 w-full rounded-md border px-3 py-2" />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-muted-foreground">New password</label>
+                  <input name="newPassword" type="password" required className="mt-1 w-full rounded-md border px-3 py-2" />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-muted-foreground">Confirm new password</label>
+                  <input name="confirmPassword" type="password" required className="mt-1 w-full rounded-md border px-3 py-2" />
+                </div>
+
+                <div className="flex items-center justify-end">
+                  <button disabled={isLoading} type="submit" className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-white">{isLoading?'Changing...':'Change password'}</button>
+                </div>
+              </form>
             </div>
           </CardContent>
         </Card>
