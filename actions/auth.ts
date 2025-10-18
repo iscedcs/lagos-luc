@@ -4,8 +4,6 @@ import { signIn, signOut } from "@/auth";
 import { axiosRequest, lucClient } from "@/axios-client";
 import { API_ROUTE, BASE_URL } from "@/lib/const";
 import { AxiosError } from "axios";
-import { error } from "console";
-import { success } from "zod";
 
 export async function signInAction(
   email: string,
@@ -35,10 +33,10 @@ export async function signOutAction() {
 
 export async function registerPropertyOwner(formData: FormData) {
   try {
-    const response = await fetch("/api/auth/create", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await axiosRequest(
+      lucClient,
+      { url: "/api/auth/create", method: "POST", data: formData }
+    );
   } catch (error) {
     console.error("Error registering property owner:", error);
   }
@@ -107,20 +105,24 @@ export async function changeUserPassword(formData: FormData) {
 
 export async function requestEmailVerificationCode(email: string) {
   try {
-    const response = await fetch("/api/auth/request-verify-email-code", {
+    const response = await axiosRequest(lucClient, {
+      url: API_ROUTE.auth.requestEmailVerificationCode,
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
+      data: { email },  
     });
 
-    if (!response.ok) {
+    console.log({response: response.data});
+
+    if (!response.data) {
       throw new Error("Failed to request email verification code");
     }
 
     return { success: true };
   } catch (error) {
+    if (error instanceof AxiosError) {
+      const readableError = error.response?.data?.message || error.message;
+      return { error: readableError };
+    }
     console.error("Error requesting email verification code:", error);
     return { error: "Failed to request email verification code" };
   }
@@ -181,37 +183,61 @@ export async function sendResetTokenToPhone(formData: FormData) {
   }
 }
 
-export async function resetPasswordWithEmail(formData: FormData) {
+export async function resetPasswordWithEmail(email: string, resetCode: string, newPassword: string) {
   try {
-    const response = await fetch("/api/auth/reset-password-email", {
+    const response = await axiosRequest(lucClient, {
+      url: API_ROUTE.auth.resetPasswordWithEmail,
       method: "POST",
-      body: formData,
+      data: { 
+        email, 
+        resetCode,
+        newPassword
+      },
     });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to reset password");
+
+    if (!response.data) {
+      return{
+        error:"Failed to verify code and reset password"
+      };
     }
+
     return { success: true };
   } catch (error) {
-    console.error("Error resetting password:", error);
-    return { error: "Failed to reset password" };
+    if (error instanceof AxiosError) {
+      const readableError = error.response?.data?.message || error.message;
+      return{
+        error:readableError
+      };
+    }
+    console.error("Error verifying code and resetting password:", error);
+    return{
+      error:"Failed to verify code and reset password"
+    };
   }
 }
 
-export async function sendResetTokenToEmail(formData: FormData) {
+export async function sendResetTokenToEmail(email: string) {
   try {
-    const response = await fetch("/api/auth/send-reset-token-email", {
+    const response = await axiosRequest(lucClient, {
+      url: API_ROUTE.auth.SendResetTokenToEmail,
       method: "POST",
-      body: formData,
+      data: { email },  
     });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to send reset token");
+
+    console.log({response: response.data});
+
+    if (!response.data) {
+      throw new Error("Failed to request email verification code");
     }
+
     return { success: true };
   } catch (error) {
-    console.error("Error sending reset token:", error);
-    return { error: "Failed to send reset token" };
+    if (error instanceof AxiosError) {
+      const readableError = error.response?.data?.message || error.message;
+      return { error: readableError };
+    }
+    console.error("Error requesting email verification code:", error);
+    return { error: "Failed to request email verification code" };
   }
 }
 

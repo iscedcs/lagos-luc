@@ -18,12 +18,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useToast } from "@/components/ui/use-toast"
+import { createZone } from "@/actions/zone"
 
 const formSchema = z.object({
   zoneName: z.string().min(2, {
     message: "Zone name must be at least 2 characters.",
   }),
-  zoneType: z.string({
+  zoneType: z.enum(["PREMIUM", "STANDARD", "DEVELOPING"], {
     message: "Please select a zone type.",
   }),
   residentialRate: z.string().refine((val) => !isNaN(Number.parseFloat(val)), {
@@ -35,27 +37,78 @@ const formSchema = z.object({
   industrialRate: z.string().refine((val) => !isNaN(Number.parseFloat(val)), {
     message: "Industrial rate must be a number.",
   }),
+  status: z.enum(["ACTIVE", "INACTIVE"], {
+    message: "Please select a status.",
+  }),
+  taxRate: z.string().refine((val) => !isNaN(Number.parseFloat(val)), {
+    message: "Tax rate must be a number.",
+  }),
+  avgPropertyValue: z.string().refine((val) => !isNaN(Number.parseFloat(val)), {
+    message: "Average property value must be a number.",
+  }),
 });
 
-export default function AddZoneModal() {
+interface AddZoneModalProps {
+  onZoneAdded?: () => void;
+}
+
+export default function AddZoneModal({ onZoneAdded }: AddZoneModalProps) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema as any),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       zoneName: "",
-      zoneType: "",
-      residentialRate: "0.5",
-      commercialRate: "0.8",
-      industrialRate: "0.6",
+      zoneType: "STANDARD",
+      residentialRate: "0.05",
+      commercialRate: "0.1",
+      industrialRate: "0.15",
+      status: "ACTIVE",
+      taxRate: "0.075",
+      avgPropertyValue: "1000000",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, you would submit this data to your backend
-    console.log(values);
-    setOpen(false);
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setLoading(true);
+      const response = await createZone({
+        zoneName: values.zoneName,
+        zoneType: values.zoneType,
+        residentialRate: Number(values.residentialRate),
+        commercialRate: Number(values.commercialRate),
+        industrialRate: Number(values.industrialRate),
+        status: values.status,
+        taxRate: Number(values.taxRate),
+        avgPropertyValue: Number(values.avgPropertyValue),
+      });
+
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: "Zone created successfully",
+        });
+        setOpen(false);
+        form.reset();
+        onZoneAdded?.();
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to create zone",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -109,9 +162,9 @@ export default function AddZoneModal() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="premium">Premium</SelectItem>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="developing">Developing</SelectItem>
+                      <SelectItem value="PREMIUM">Premium</SelectItem>
+                      <SelectItem value="STANDARD">Standard</SelectItem>
+                      <SelectItem value="DEVELOPING">Developing</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>

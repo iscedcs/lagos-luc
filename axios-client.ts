@@ -2,6 +2,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { auth } from "./auth";
 import { BASE_URL } from "./lib/const";
+import { redirect } from "next/navigation";
 
 // export const eventClient = axios.create({
 //   baseURL: EVENT_BASE_URL,
@@ -28,7 +29,7 @@ export const axiosRequest = async (
   if (requireAuth) {
     const session = await auth();
     if (!session?.access_token) {
-      throw new Error("No access token found in session.");
+      redirect("/login");
     }
 
     finalConfig.headers = {

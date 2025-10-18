@@ -1,3 +1,5 @@
+"use client"
+
 import type { Metadata } from "next"
 import { Filter, Globe, MapPin, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -7,13 +9,44 @@ import ZonesMap from "./zones-map"
 import ZonesTable from "./zones-table"
 import ZoneRatesTable from "./zone-rates-table"
 import AddZoneModal from "./add-zone-modal"
-
-export const metadata: Metadata = {
-  title: "Property Zones | Lagos Property Map",
-  description: "Manage property zones and areas in the Lagos Property Map system",
-}
+import { getZoneStats } from "@/actions/zone"
+import { useCallback, useEffect, useState } from "react"
+import { ZoneStats } from "@/actions/zone"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function PropertyZonesPage() {
+  const [stats, setStats] = useState<ZoneStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const fetchStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await getZoneStats();
+      if (response.success) {
+        setStats(response.data);
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to fetch zone statistics",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
   return (
     <div className="flex-1 space-y-6 p-6 md:p-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -26,11 +59,17 @@ export default function PropertyZonesPage() {
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button variant="outline" size="sm" className="h-9">
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9"
+            onClick={fetchStats}
+            disabled={loading}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <AddZoneModal />
+          <AddZoneModal onZoneAdded={fetchStats} />
         </div>
       </div>
 
@@ -42,7 +81,7 @@ export default function PropertyZonesPage() {
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{stats?.totalZones || 0}</div>
             <p className="text-xs text-muted-foreground">Across Lagos State</p>
           </CardContent>
         </Card>
@@ -53,30 +92,37 @@ export default function PropertyZonesPage() {
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">6</div>
+            <div className="text-2xl font-bold">{stats?.zoneTypeBreakdown?.PREMIUM || 0}</div>
             <p className="text-xs text-muted-foreground">High-value property areas</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Average Value</CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0.45%</div>
-            <p className="text-xs text-muted-foreground">Average LUC rate across zones</p>
+            <div className="text-2xl font-bold">
+              {new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }).format(stats?.avgPropertyValue || 100000)}
+            </div>
+            <p className="text-xs text-muted-foreground">Average property value across zones</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Zone Updates</CardTitle>
+            <CardTitle className="text-sm font-medium">Development Zones</CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Last: 15 days ago</div>
-            <p className="text-xs text-muted-foreground">Last zone boundary update</p>
+            <div className="text-2xl font-bold">{stats?.zoneTypeBreakdown?.DEVELOPING || 0}</div>
+            <p className="text-xs text-muted-foreground">Growing property areas</p>
           </CardContent>
         </Card>
       </div>
