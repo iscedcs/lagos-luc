@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Download, Printer, X } from "lucide-react"
 import QRCode from "react-qr-code"
 import Image from "next/image";
+import { ar } from "zod/v4/locales"
 
 interface PropertyCertificateProps {
   property: any
@@ -144,7 +145,7 @@ export default function PropertyCertificate({ property, onClose }: PropertyCerti
                   <div>
                     <p className="text-sm font-medium">Property Use:</p>
                     <p>{property.propertyUse}</p>
-                  </div>
+                  </div> 
                   {property.propertyType === "Building" ||
                   property.propertyType === "Mixed-use" ? (
                     <>
@@ -280,4 +281,6 @@ function calculateLUC(property: any) {
   const lucRate = 0.005 // 0.5%
   return (propertyValue * lucRate).toFixed(2)
 }
+
+      
 

@@ -7,14 +7,23 @@ import { Badge } from "@/components/ui/badge"
 import PropertiesDataTable from "./properties-data-table"
 import PropertyStatusChart from "./property-status-chart"
 import PropertyFilters from "./property-filters"
-import Link from "next/link";
+import EmptyPropertiesState from "./empty-properties-state"
+import Link from "next/link"
+import { getAllProperties } from "@/actions/properties"
 
 export const metadata: Metadata = {
   title: "Property Management | Lagos Property Map",
   description: "Manage all properties in the Lagos Property Map system",
 }
 
-export default function PropertiesPage() {
+export default async function PropertiesPage() {
+  const propertiesData = await getAllProperties(100, 1)
+  const properties = propertiesData.data || []
+  const totalProperties = propertiesData.meta?.total || 0
+  const verifiedCount = properties.filter(p => p.status === 'VERIFIED').length
+  const pendingCount = properties.filter(p => p.status === 'PENDING').length
+  const rejectedCount = properties.filter(p => p.status === 'REJECTED').length
+
   return (
     <div className="flex-1 space-y-6 p-6 md:p-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -60,7 +69,7 @@ export default function PropertiesPage() {
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">15,432</div>
+            <div className="text-2xl font-bold">{totalProperties.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Across all zones and categories
             </p>
@@ -75,10 +84,10 @@ export default function PropertiesPage() {
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12,845</div>
+            <div className="text-2xl font-bold">{verifiedCount.toLocaleString()}</div>
             <div className="flex items-center">
               <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200">
-                83.2%
+                {totalProperties > 0 ? ((verifiedCount / totalProperties) * 100).toFixed(1) : 0}%
               </Badge>
               <span className="ml-2 text-xs text-muted-foreground">
                 of total
@@ -95,10 +104,10 @@ export default function PropertiesPage() {
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,876</div>
+            <div className="text-2xl font-bold">{pendingCount.toLocaleString()}</div>
             <div className="flex items-center">
               <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-                12.2%
+                {totalProperties > 0 ? ((pendingCount / totalProperties) * 100).toFixed(1) : 0}%
               </Badge>
               <span className="ml-2 text-xs text-muted-foreground">
                 of total
@@ -115,10 +124,10 @@ export default function PropertiesPage() {
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">711</div>
+            <div className="text-2xl font-bold">{rejectedCount.toLocaleString()}</div>
             <div className="flex items-center">
               <Badge className="bg-red-100 text-red-800 hover:bg-red-200">
-                4.6%
+                {totalProperties > 0 ? ((rejectedCount / totalProperties) * 100).toFixed(1) : 0}%
               </Badge>
               <span className="ml-2 text-xs text-muted-foreground">
                 of total
@@ -143,40 +152,44 @@ export default function PropertiesPage() {
         </CardContent>
       </Card>
 
-      {/* Properties Table with Tabs */}
-      <Tabs defaultValue="all" className="w-full">
-        <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="all">All Properties</TabsTrigger>
-            <TabsTrigger value="residential">Residential</TabsTrigger>
-            <TabsTrigger value="commercial">Commercial</TabsTrigger>
-            <TabsTrigger value="industrial">Industrial</TabsTrigger>
-            <TabsTrigger value="government">Government</TabsTrigger>
-          </TabsList>
+      {/* Properties Table or Empty State */}
+      {properties.length === 0 ? (
+        <EmptyPropertiesState />
+      ) : (
+        <Tabs defaultValue="all" className="w-full">
+          <div className="flex items-center justify-between">
+            <TabsList>
+              <TabsTrigger value="all">All Properties</TabsTrigger>
+              <TabsTrigger value="residential">Residential</TabsTrigger>
+              <TabsTrigger value="commercial">Commercial</TabsTrigger>
+              <TabsTrigger value="industrial">Industrial</TabsTrigger>
+              <TabsTrigger value="government">Government</TabsTrigger>
+            </TabsList>
 
-          <PropertyFilters />
-        </div>
+            <PropertyFilters />
+          </div>
 
-        <TabsContent value="all" className="mt-6">
-          <PropertiesDataTable filter="all" />
-        </TabsContent>
+          <TabsContent value="all" className="mt-6">
+            <PropertiesDataTable data={properties} filter="all" />
+          </TabsContent>
 
-        <TabsContent value="residential" className="mt-6">
-          <PropertiesDataTable filter="residential" />
-        </TabsContent>
+          <TabsContent value="residential" className="mt-6">
+            <PropertiesDataTable data={properties.filter(p => p.propertyUse === 'RESIDENTIAL')} filter="residential" />
+          </TabsContent>
 
-        <TabsContent value="commercial" className="mt-6">
-          <PropertiesDataTable filter="commercial" />
-        </TabsContent>
+          <TabsContent value="commercial" className="mt-6">
+            <PropertiesDataTable data={properties.filter(p => p.propertyUse === 'COMMERCIAL')} filter="commercial" />
+          </TabsContent>
 
-        <TabsContent value="industrial" className="mt-6">
-          <PropertiesDataTable filter="industrial" />
-        </TabsContent>
+          <TabsContent value="industrial" className="mt-6">
+            <PropertiesDataTable data={properties.filter(p => p.propertyUse === 'INDUSTRIAL')} filter="industrial" />
+          </TabsContent>
 
-        <TabsContent value="government" className="mt-6">
-          <PropertiesDataTable filter="government" />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="government" className="mt-6">
+            <PropertiesDataTable data={properties} filter="government" />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }

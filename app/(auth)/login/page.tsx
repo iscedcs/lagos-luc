@@ -14,6 +14,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginForm from "./login-form";
+
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Login | Lagos Property Map",
   description: "Login to your Lagos Property Map account",

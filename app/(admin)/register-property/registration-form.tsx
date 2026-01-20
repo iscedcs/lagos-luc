@@ -32,6 +32,7 @@ import { LocationValueForm } from "./form-sections/location-value";
 import { PropertyDetailsForm } from "./form-sections/property-details";
 import { ValuationParametersForm } from "./form-sections/valuation-parameters";
 import PropertyCertificate from "./property-certificate";
+import { createProperty } from "@/actions/properties";
 
 // Define the full form schema combining all sections
 export const registrationFormSchema = z.object({
@@ -40,17 +41,14 @@ export const registrationFormSchema = z.object({
   streetAddress: z.string().min(5, "Street address is required"),
   lga: z.string().min(1, "LGA is required"),
   lcda: z.string().optional(),
-  ward: z.string().min(1, "Ward is required"),
+  ward: z.string().optional(),
   gpsCoordinates: z.object({
     latitude: z.number(),
     longitude: z.number(),
   }),
 
   // Owner Information
-  ownerName: z.string().min(2, "Full name is required"),
-  phoneNumber: z.string().min(10, "Valid phone number is required"),
-  email: z.string().email("Valid email is required"),
-  identificationNumber: z.string().min(5, "Identification number is required"),
+  ownerId: z.string().min(1, "Property owner is required"),
   ownershipType: z.enum(["Individual", "Corporate", "Government"]),
 
   // Property Classification
@@ -118,10 +116,7 @@ export default function RegistrationForm() {
       },
 
       // Owner Information
-      ownerName: "",
-      phoneNumber: "",
-      email: "",
-      identificationNumber: "",
+      ownerId: "",
       ownershipType: "Individual",
 
       // Property Classification
@@ -166,8 +161,19 @@ export default function RegistrationForm() {
   const propertyType = form.watch("propertyType");
 
   const onSubmit = async (data: RegistrationFormValues) => {
+    setIsSubmitting(true);
+
+    // Get the current user info from session
+    let isSuperAdmin = false;
     try {
-      setIsSubmitting(true);
+      const userResponse = await fetch("/api/auth/session");
+      const session = await userResponse.json();
+      isSuperAdmin = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "superadmin";
+    } catch {
+      // If session fetch fails, isSuperAdmin remains false
+    }
+
+    try {
       setFormError(null);
       console.log("Form submitted with data:", data);
 
@@ -195,36 +201,80 @@ export default function RegistrationForm() {
         }
       }
 
-      // For demo purposes, we'll simulate a successful registration
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const result = {
-        success: true,
-        propertyId: `LGS-${Math.floor(100000 + Math.random() * 900000)}`,
-        message: "Property registered successfully",
+      // Map locationClass to API format
+      const locationClassMap: Record<string, string> = {
+        "High": "HighValueZone",
+        "Medium": "MediumValueZone",
+        "Low": "LowValueZone",
       };
 
-      console.log("Registration result:", result);
+      // Map form data to API format
+      const propertyPayload = {
+        code: data.propertyId || `PROP-${Date.now()}`,
+        address: data.streetAddress,
+        lga: data.lga,
+        lcda: data.lcda || "",
+        ward: data.ward || "",
+        ownerId: data.ownerId,
+        ownershipType: data.ownershipType === "Individual" ? "INDIVIDUAL" : data.ownershipType === "Corporate" ? "COMPANY" : "INDIVIDUAL",
+        zoneId: data.locationZone,
+        propertyType: data.propertyType === "Mixed-use" ? "BUILDING" : data.propertyType.toUpperCase(),
+        propertyUse: data.propertyUse.toUpperCase(),
+        locationClass: locationClassMap[data.locationClass] || "MediumValueZone",
+        buildingType: data.buildingType,
+        numberOfUnits: data.numberOfUnits,
+        buildingHeight: data.numberOfFloors,
+        coveredArea: data.totalCoveredArea || data.totalLandArea || 0,
+        yearBuilt: data.yearOfConstruction,
+        condition: data.buildingCondition?.toUpperCase() || "NEW",
+        wallType: data.wallType,
+        roofType: data.roofType,
+        finishingQuality: data.finishingQuality?.toUpperCase() || "BASIC",
+        locationWeight: data.locationWeight,
+        useWeight: data.useWeight,
+        typeWeight: data.typeWeight,
+        buildingFactor: data.buildingFactor || 1.0,
+        areaFactor: data.areaFactor,
+        estimatedValue: 0, // This would need to be calculated
+        annualLUC: 0, // This would need to be calculated
+        status: "PENDING",
+        priority: "MEDIUM",
+      };
 
-      // Set the registered property data for the certificate
-      setRegisteredProperty({
-        ...data,
-        propertyId: result.propertyId,
-        registrationDate: new Date().toISOString(),
-        expiryDate: new Date(
-          new Date().setFullYear(new Date().getFullYear() + 1)
-        ).toISOString(),
-        qrCodeData: `LGS-PROP-${result.propertyId}`,
-      });
+      // Call the createProperty action
+      const result = await createProperty(propertyPayload);
 
-      // Show the certificate
-      setShowCertificate(true);
+      if (result.success && result.data) {
+        console.log("Property created successfully:", result.data);
+
+        // Set the registered property data for the certificate
+        setRegisteredProperty({
+          ...data,
+          propertyId: result.data.code,
+          id: result.data.id,
+          registrationDate: result.data.createdAt,
+          expiryDate: new Date(
+            new Date().setFullYear(new Date().getFullYear() + 1)
+          ).toISOString(),
+          qrCodeData: `LGS-PROP-${result.data.code}`,
+        });
+
+        // Show the certificate
+        setShowCertificate(true);
+      } else {
+        setFormError(result.message || "Failed to register property");
+        if (isSuperAdmin) {
+          setDebugInfo(result);
+        }
+      }
     } catch (error) {
       console.error("Error registering property:", error);
       setFormError(
         error instanceof Error ? error.message : "An unexpected error occurred"
       );
-      setDebugInfo(error);
+      if (isSuperAdmin) {
+        setDebugInfo(error);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -243,10 +293,15 @@ export default function RegistrationForm() {
       const firstError = Object.entries(form.formState.errors)[0];
       const [fieldName, error] = firstError;
 
+      const errorMsg = (error as any)?.message || `Invalid ${fieldName}`;
       setFormError(
-        `Validation error: ${error.message || `Invalid ${fieldName}`}`
+        `Validation error in ${fieldName}: ${errorMsg}`
       );
-      setDebugInfo(form.formState.errors);
+      setDebugInfo({
+        field: fieldName,
+        error: error,
+        allErrors: form.formState.errors,
+      });
 
       // Navigate to the tab with the error
       if (

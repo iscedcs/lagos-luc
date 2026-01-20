@@ -34,7 +34,6 @@ export async function getAllUsers() {
     return userData;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return {
         users: [] as UserInterface[],
         count: 0,
@@ -44,12 +43,60 @@ export async function getAllUsers() {
         },
       };
     } else {
-      console.error("Error fetching all users:", error);
       return {
         users: [] as UserInterface[],
         count: 0,
         pagination: {
           limit: 10,
+          offset: 0,
+        },
+      };
+    }
+  }
+}
+
+export async function getPropertyOwners() {
+  const session = await auth();
+  if (!session || !session?.access_token) {
+    return {
+      users: [] as UserInterface[],
+      count: 0,
+      pagination: {
+        limit: 1000,
+        offset: 0,
+      },
+    };
+  }
+
+  try {
+    const response = await axiosRequest(
+      lucClient,
+      {
+        url: `${API_ROUTE.user.all}?role=PROPERTY_OWNER&limit=1000`,
+        method: "GET",
+      },
+      true
+    );
+
+    const userData: UserDataInterface = response.data.data;
+
+    return userData;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      return {
+        users: [] as UserInterface[],
+        count: 0,
+        pagination: {
+          limit: 1000,
+          offset: 0,
+        },
+      };
+    } else {
+      return {
+        users: [] as UserInterface[],
+        count: 0,
+        pagination: {
+          limit: 1000,
           offset: 0,
         },
       };
@@ -71,10 +118,8 @@ export async function getUserProfile() {
     return userProfile;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return null;
     } else {
-      console.error("Error fetching user profile:", error);
       return null;
     }
   }
@@ -100,10 +145,8 @@ export async function UpdateUserProfile(formData: FormData) {
     return { user: userProfile };
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return { error: error.response?.data.message || "Failed to update user profile" };
     } else {
-      console.error("Error updating user profile:", error);
       return { error: "Failed to update user profile" };
     }
   }
@@ -123,10 +166,8 @@ export async function getUserById(userId: string) {
     return user;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return null;
     } else {
-      console.error("Error fetching user by ID:", error);
       return null;
     } 
   }
@@ -154,10 +195,8 @@ export async function UpdateUser (formData: FormData, userId: string) {
   }
   catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return { error: error.response?.data.message || "Failed to update user" };
     } else {
-      console.error("Error updating user:", error);
       return { error: "Failed to update user" };
     } 
 } 
@@ -178,10 +217,8 @@ export async function getAllBlackListedAdmins() {
     return userData;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return null;
     } else {
-      console.error("Error fetching all blacklisted admins:", error);
       return null;
     }
   }
@@ -202,10 +239,8 @@ export async function getAllBlackListedAgents() {
     return userData;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return null;
     } else {
-      console.error("Error fetching all blacklisted agents:", error);
       return null;
     }
   }
@@ -225,10 +260,8 @@ export async function softDeleteUser(userId: string) {
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return { error: error.response?.data.message || "Failed to delete user" };
     } else {
-      console.error("Error deleting user:", error);
       return { error: "Failed to delete user" };
     }   
   }
@@ -258,10 +291,8 @@ export async function setNewPasswordForUser(formData: FormData, userId: string) 
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return { error: error.response?.data.message || "Failed to set new password" };
     } else {
-      console.error("Error setting new password:", error);
       return { error: "Failed to set new password" };
     }
   }
@@ -296,10 +327,8 @@ export async function CreateUser(formData: FormData, role: string) {
     return { user };
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data);
       return { error: error.response?.data.message || "Failed to create user" };
     } else {
-      console.error("Error creating user:", error);
       return { error: "Failed to create user" };
     }
   }
@@ -320,10 +349,8 @@ export async function allAdminUsers() {
     return userData;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.response?.data.message);
       return null;
     } else {
-      console.error("Error fetching all users:", error);
       return null;
     } 
   }

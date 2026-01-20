@@ -1,3 +1,4 @@
+
 export const BASE_URL =
   process.env.BACKEND_URL || "https://land-use-api.onrender.com";
 export const API_ROUTE = {
@@ -35,6 +36,14 @@ export const API_ROUTE = {
     update: "/api/zone/update",
     delete: "/api/zone/delete",
     stats: "/api/zone/stats"
+  },
+  property: {
+    all: "/api/property/all",
+    one: "/api/property/one/{id}",
+    create: "/api/property/create",
+    update: "/api/property/update/{id}",
+    delete: "/api/property/delete/{id}",
+    softDelete: "/api/property/soft-delete/{id}",
   },
 };
 

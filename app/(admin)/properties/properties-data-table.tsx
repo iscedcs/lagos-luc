@@ -46,93 +46,67 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
-// Define the property data type
-type Property = {
-  id: string;
-  propertyId: string;
-  address: string;
-  lga: string;
-  zone: string;
-  type: string;
-  use: string;
-  ownerName: string;
-  status: "verified" | "pending" | "disputed";
-  registrationDate: string;
-  value: number;
-  luc: number;
-  paymentStatus: "paid" | "unpaid" | "partial";
-};
-
-// Generate mock data
-const generateMockData = (count: number): Property[] => {
-  const propertyTypes = ["Land", "Building", "Mixed-use"];
-  const propertyUses = [
-    "Residential",
-    "Commercial",
-    "Industrial",
-    "Government",
-  ];
-  const zones = [
-    "Lagos Island",
-    "Ikeja",
-    "Lekki",
-    "Surulere",
-    "Ikorodu",
-    "Badagry",
-  ];
-  const lgas = [
-    "Lagos Island",
-    "Ikeja",
-    "Eti-Osa",
-    "Surulere",
-    "Ikorodu",
-    "Badagry",
-  ];
-  const statuses = ["verified", "pending", "disputed"] as const;
-  const paymentStatuses = ["paid", "unpaid", "partial"] as const;
+// Generate mock data for PropertyInterface
+const generateMockData = (count: number): PropertyInterface[] => {
+  const propertyTypes = ["LAND", "BUILDING"] as const;
+  const propertyUses = ["RESIDENTIAL", "COMMERCIAL", "INDUSTRIAL", "MIXED"] as const;
+  const conditions = ["NEW", "GOOD", "FAIR", "POOR"] as const;
+  const statuses = ["PENDING", "APPROVED", "REJECTED", "VERIFIED"] as const;
+  const priorities = ["LOW", "MEDIUM", "HIGH"] as const;
+  const ownershipTypes = ["INDIVIDUAL", "COMPANY"] as const;
 
   return Array.from({ length: count }, (_, i) => {
-    const type =
-      propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
-    const use = propertyUses[Math.floor(Math.random() * propertyUses.length)];
-    const zone = zones[Math.floor(Math.random() * zones.length)];
-    const lga = lgas[Math.floor(Math.random() * lgas.length)];
+    const propertyType = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
+    const propertyUse = propertyUses[Math.floor(Math.random() * propertyUses.length)];
     const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const paymentStatus =
-      paymentStatuses[Math.floor(Math.random() * paymentStatuses.length)];
-    const value = Math.floor(Math.random() * 100000000) + 1000000; // Between 1M and 100M
-    const luc = Math.floor(value * 0.005); // 0.5% of property value
+    const value = Math.floor(Math.random() * 100000000) + 1000000;
 
     return {
       id: `id-${i + 1}`,
-      propertyId: `LGS-${100000 + i}`,
-      address: `${Math.floor(Math.random() * 200) + 1} ${zone} Road, ${lga}`,
-      lga,
-      zone,
-      type,
-      use,
-      ownerName: [
-        "John Doe",
-        "Jane Smith",
-        "David Adeyemi",
-        "Sarah Johnson",
-        "Michael Chen",
-      ][Math.floor(Math.random() * 5)],
+      code: `P${100000 + i}`,
+      address: `${Math.floor(Math.random() * 200) + 1} Lekki Road, Lagos`,
+      lga: "Eti-Osa",
+      lcda: "Ikoyi-Obalende",
+      ward: `Ward ${String.fromCharCode(65 + (i % 5))}`,
+      ownerId: `owner-${i + 1}`,
+      ownershipType: ownershipTypes[Math.floor(Math.random() * ownershipTypes.length)],
+      companyId: null,
+      zoneId: `zone-${i % 3}`,
+      assignedAgentId: null,
+      createdAt: new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString(),
+      updatedAt: new Date().toISOString(),
+      deletedAt: null,
+      propertyType,
+      propertyUse,
+      locationClass: "HighValueZone",
+      buildingType: propertyType === "BUILDING" ? "Detached Duplex" : undefined,
+      numberOfUnits: propertyType === "BUILDING" ? Math.floor(Math.random() * 10) + 1 : undefined,
+      buildingHeight: propertyType === "BUILDING" ? Math.floor(Math.random() * 5) + 1 : undefined,
+      coveredArea: Math.floor(Math.random() * 1000) + 100,
+      yearBuilt: propertyType === "BUILDING" ? 2015 : undefined,
+      condition: conditions[Math.floor(Math.random() * conditions.length)],
+      wallType: "Cement Block",
+      roofType: "Aluminium Roof",
+      finishingQuality: "BASIC",
+      locationWeight: 0.75,
+      useWeight: 0.6,
+      typeWeight: 0.9,
+      buildingFactor: 1.15,
+      areaFactor: 1.3,
+      estimatedValue: value,
+      annualLUC: Math.floor(value * 0.005),
+      waitTime: Math.floor(Math.random() * 100),
+      priority: priorities[Math.floor(Math.random() * priorities.length)],
       status,
-      registrationDate: new Date(
-        Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)
-      )
-        .toISOString()
-        .split("T")[0],
-      value,
-      luc,
-      paymentStatus,
+      rejectionReason: status === "REJECTED" ? "Invalid property details" : undefined,
+      verifiedAt: status === "VERIFIED" ? new Date().toISOString() : undefined,
+      verifiedBy: status === "VERIFIED" ? "admin@system.com" : undefined,
     };
   });
 };
 
 // Define the columns
-const columns: ColumnDef<Property>[] = [
+const columns: ColumnDef<PropertyInterface>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -156,10 +130,10 @@ const columns: ColumnDef<Property>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "propertyId",
+    accessorKey: "code",
     header: "Property ID",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("propertyId")}</div>
+      <div className="font-medium">{row.getValue("code")}</div>
     ),
   },
   {
@@ -180,24 +154,19 @@ const columns: ColumnDef<Property>[] = [
     ),
   },
   {
-    accessorKey: "zone",
-    header: "Zone",
-    cell: ({ row }) => <div>{row.getValue("zone")}</div>,
+    accessorKey: "lga",
+    header: "LGA",
+    cell: ({ row }) => <div>{row.getValue("lga")}</div>,
   },
   {
-    accessorKey: "type",
+    accessorKey: "propertyType",
     header: "Type",
-    cell: ({ row }) => <div>{row.getValue("type")}</div>,
+    cell: ({ row }) => <div>{row.getValue("propertyType")}</div>,
   },
   {
-    accessorKey: "use",
+    accessorKey: "propertyUse",
     header: "Use",
-    cell: ({ row }) => <div>{row.getValue("use")}</div>,
-  },
-  {
-    accessorKey: "ownerName",
-    header: "Owner",
-    cell: ({ row }) => <div>{row.getValue("ownerName")}</div>,
+    cell: ({ row }) => <div>{row.getValue("propertyUse")}</div>,
   },
   {
     accessorKey: "status",
@@ -208,20 +177,22 @@ const columns: ColumnDef<Property>[] = [
       return (
         <Badge
           className={
-            status === "verified"
+            status === "VERIFIED"
               ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-              : status === "pending"
+              : status === "PENDING"
               ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-              : "bg-red-100 text-red-800 hover:bg-red-200"
+              : status === "REJECTED"
+              ? "bg-red-100 text-red-800 hover:bg-red-200"
+              : "bg-gray-100 text-gray-800 hover:bg-gray-200"
           }
         >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
+          {status}
         </Badge>
       );
     },
   },
   {
-    accessorKey: "value",
+    accessorKey: "estimatedValue",
     header: ({ column }) => {
       return (
         <Button
@@ -234,7 +205,7 @@ const columns: ColumnDef<Property>[] = [
       );
     },
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue("value"));
+      const amount = Number.parseFloat(row.getValue("estimatedValue"));
       const formatted = new Intl.NumberFormat("en-NG", {
         style: "currency",
         currency: "NGN",
@@ -245,10 +216,10 @@ const columns: ColumnDef<Property>[] = [
     },
   },
   {
-    accessorKey: "luc",
-    header: "LUC",
+    accessorKey: "annualLUC",
+    header: "Annual LUC",
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue("luc"));
+      const amount = Number.parseFloat(row.getValue("annualLUC"));
       const formatted = new Intl.NumberFormat("en-NG", {
         style: "currency",
         currency: "NGN",
@@ -256,27 +227,6 @@ const columns: ColumnDef<Property>[] = [
       }).format(amount);
 
       return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "paymentStatus",
-    header: "Payment",
-    cell: ({ row }) => {
-      const status = row.getValue("paymentStatus") as string;
-
-      return (
-        <Badge
-          className={
-            status === "paid"
-              ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-              : status === "partial"
-              ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-              : "bg-red-100 text-red-800 hover:bg-red-200"
-          }
-        >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </Badge>
-      );
     },
   },
   {
@@ -330,14 +280,18 @@ const columns: ColumnDef<Property>[] = [
 
 export default function PropertiesDataTable({
   filter = "all",
+  data: propertyData = [],
 }: {
   filter?: string;
+  data?: PropertyInterface[];
 }) {
-  // Generate mock data
-  const data = generateMockData(100).filter((property) => {
-    if (filter === "all") return true;
-    return property.use.toLowerCase() === filter.toLowerCase();
-  });
+  // Use provided data or generate mock data if none provided
+  const data = propertyData.length > 0 
+    ? propertyData
+    : generateMockData(100).filter((property) => {
+        if (filter === "all") return true;
+        return property.propertyUse.toLowerCase() === filter.toLowerCase();
+      });
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);

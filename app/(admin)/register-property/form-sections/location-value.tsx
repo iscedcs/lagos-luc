@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { RegistrationFormValues } from "../registration-form";
 import {
@@ -24,36 +24,63 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-
-// Location zones with their values
-const locationZones = {
-  "Lagos Island CBD": { class: "High", weight: 1.5 },
-  Ikoyi: { class: "High", weight: 1.5 },
-  "Victoria Island": { class: "High", weight: 1.5 },
-  "Lekki Phase 1": { class: "High", weight: 1.4 },
-  Lekki: { class: "Medium", weight: 1.2 },
-  "Ikeja GRA": { class: "High", weight: 1.3 },
-  Ikeja: { class: "Medium", weight: 1.1 },
-  Surulere: { class: "Medium", weight: 1.0 },
-  Yaba: { class: "Medium", weight: 1.0 },
-  Gbagada: { class: "Medium", weight: 0.9 },
-  Magodo: { class: "Medium", weight: 1.0 },
-  Ilupeju: { class: "Medium", weight: 0.9 },
-  Ogba: { class: "Medium", weight: 0.8 },
-  Agege: { class: "Low", weight: 0.7 },
-  Oshodi: { class: "Low", weight: 0.8 },
-  Mushin: { class: "Low", weight: 0.7 },
-  Ikorodu: { class: "Low", weight: 0.7 },
-  Badagry: { class: "Low", weight: 0.6 },
-  Epe: { class: "Low", weight: 0.6 },
-};
+import { getAllZones } from "@/actions/zone";
+import type { Zone } from "@/actions/zone";
 
 interface LocationValueFormProps {
   form: UseFormReturn<RegistrationFormValues>;
 }
 
 export function LocationValueForm({ form }: LocationValueFormProps) {
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [isLoadingZones, setIsLoadingZones] = useState(true);
+  const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
+  
   const locationZone = form.watch("locationZone");
+
+  // Fetch zones on component mount
+  useEffect(() => {
+    const fetchZones = async () => {
+      try {
+        const result = await getAllZones(1000, 0);
+        if (result.success && result.data?.zones) {
+          setZones(result.data.zones);
+        }
+      } catch (error) {
+        console.error("Error fetching zones:", error);
+      } finally {
+        setIsLoadingZones(false);
+      }
+    };
+
+    fetchZones();
+  }, []);
+
+  // Update location class and weight when a zone is selected
+  const handleZoneChange = (zoneId: string) => {
+    form.setValue("locationZone", zoneId);
+    
+    const zone = zones.find(z => z.id === zoneId);
+    if (zone) {
+      setSelectedZone(zone);
+      
+      // Determine location class based on zone type
+      let locationClass = "Medium";
+      let weight = 1.0;
+      
+      if (zone.zoneType === "PREMIUM") {
+        locationClass = "High";
+        weight = 1.5;
+      } else if (zone.zoneType === "DEVELOPING") {
+        locationClass = "Low";
+        weight = 0.75;
+      }
+      
+      form.setValue("locationClass", locationClass as any);
+      form.setValue("locationDecimalWeight", weight);
+      form.setValue("locationWeight", weight);
+    }
+  };
 
   // Update the decimal weight when location class changes
   useEffect(() => {
@@ -72,40 +99,28 @@ export function LocationValueForm({ form }: LocationValueFormProps) {
     form.setValue("locationWeight", weight);
   }, [form.watch("locationClass")]);
 
+  // Get the selected zone object
+  const currentZone = zones.find(z => z.id === locationZone);
+
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium">Location Value</h3>
         <p className="text-sm text-muted-foreground">
-          Select the location class and provide location-specific details
+          Select the zone and location class for property valuation
         </p>
       </div>
 
-      {locationZone && (
+      {currentZone && (
         <Card className="bg-emerald-50 border-emerald-200">
           <CardContent className="p-4">
-            <div className="text-sm">
-              <p className="font-medium mb-1">
-                Selected Location Zone: {locationZone}
+            <div className="text-sm space-y-1">
+              <p className="font-medium">
+                Selected Zone: {currentZone.zoneName}
               </p>
-              {locationZones[locationZone as keyof typeof locationZones] && (
-                <>
-                  <p>
-                    Class:{" "}
-                    {
-                      locationZones[locationZone as keyof typeof locationZones]
-                        .class
-                    }
-                  </p>
-                  <p>
-                    Weight:{" "}
-                    {
-                      locationZones[locationZone as keyof typeof locationZones]
-                        .weight
-                    }
-                  </p>
-                </>
-              )}
+              <p>Type: {currentZone.zoneType}</p>
+              <p>Tax Rate: {(currentZone.taxRate * 100).toFixed(2)}%</p>
+              <p>Avg Property Value: ₦{currentZone.avgPropertyValue.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
@@ -118,31 +133,26 @@ export function LocationValueForm({ form }: LocationValueFormProps) {
           <FormItem>
             <FormLabel>Location Zone</FormLabel>
             <Select
-              onValueChange={(value) => {
-                field.onChange(value);
-
-                // Update location class and weight based on zone
-                if (locationZones[value as keyof typeof locationZones]) {
-                  const zoneInfo =
-                    locationZones[value as keyof typeof locationZones];
-                  form.setValue("locationClass", zoneInfo.class as any);
-                  form.setValue("locationDecimalWeight", zoneInfo.weight);
-                  form.setValue("locationWeight", zoneInfo.weight);
-                }
-              }}
+              onValueChange={handleZoneChange}
               value={field.value}
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select location zone" />
+                  <SelectValue placeholder={isLoadingZones ? "Loading zones..." : "Select location zone"} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {Object.keys(locationZones).map((zone) => (
-                  <SelectItem key={zone} value={zone}>
-                    {zone}
-                  </SelectItem>
-                ))}
+                {isLoadingZones ? (
+                  <SelectItem disabled value="loading">Loading zones...</SelectItem>
+                ) : zones.length > 0 ? (
+                  zones.map((zone) => (
+                    <SelectItem key={zone.id} value={zone.id}>
+                      {zone.zoneName} ({zone.zoneType})
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem disabled value="no-zones">No zones available</SelectItem>
+                )}
               </SelectContent>
             </Select>
             <FormDescription>
@@ -158,7 +168,7 @@ export function LocationValueForm({ form }: LocationValueFormProps) {
         name="locationClass"
         render={({ field }) => (
           <FormItem className="space-y-3">
-            <FormLabel>Location Class/Zone</FormLabel>
+            <FormLabel>Location Class</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
